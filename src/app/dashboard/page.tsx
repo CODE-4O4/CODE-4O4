@@ -22,7 +22,6 @@ import {
   adminQueue,
   calendarSessions,
   leaderboardPreview,
-  showcaseProjects,
   upcomingEvents,
 } from "@/lib/data";
 import { registerProjectInterest, rsvpToEvent } from "@/lib/firebase/firestore";
@@ -71,7 +70,7 @@ const readCache = (key: string) => {
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
-  const [projects, setProjects] = useState<ShowcaseProject[]>(showcaseProjects);
+  const [projects, setProjects] = useState<ShowcaseProject[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [projectStatus, setProjectStatus] = useState<Record<string, string>>(() =>
     readCache(STORAGE_KEYS.projects),
@@ -262,10 +261,19 @@ export default function DashboardPage() {
                   >
                     View all
                   </Link>
-                </div>
               </div>
-              <div className="mt-6 space-y-4">
-                {showcaseProjects.map((project) => (
+            </div>
+            <div className="mt-6 space-y-4">
+                {loadingProjects ? (
+                  <div className="text-center text-white/60 py-8">
+                    Loading projects...
+                  </div>
+                ) : projects.length === 0 ? (
+                  <div className="text-center text-white/60 py-8">
+                    No projects found. Create your first project!
+                  </div>
+                ) : (
+                  projects.map((project) => (
                   <div
                     key={project.id}
                     className="rounded-2xl border border-white/10 bg-white/5 p-5"
@@ -311,7 +319,8 @@ export default function DashboardPage() {
                       </Button>
                     )}
                   </div>
-                ))}
+                ))
+                )}
               </div>
             </div>
 
