@@ -1,19 +1,86 @@
 "use client";
 
 import Link from "next/link";
-import { adminQueue, projectInterestRequests } from "@/lib/data";
+import { useEffect, useState } from "react";
+import { adminQueue } from "@/lib/data";
 import RequestCard from "@/components/admin/request-card";
 import { PageContainer } from "@/components/shared/page-container";
 import { PageIntro } from "@/components/shared/page-intro";
 import { CheckCircle, Users } from "lucide-react";
 
+type ProjectInterest = {
+  id: string;
+  projectId: string;
+  userId: string;
+  status: string;
+  createdAt?: any;
+  projectName?: string;
+  userName?: string;
+  userEmail?: string;
+};
+
 const AdminPage = () => {
-  const handleApprove = (requestId: string, userName: string) => {
-    alert(`✅ Approved ${userName}! (Demo mode - not persisted)`);
+  const [projectInterests, setProjectInterests] = useState<ProjectInterest[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch project interests from Firestore
+  useEffect(() => {
+    const fetchInterests = async () => {
+      try {
+        console.log("🔄 Fetching all project interests...");
+        const response = await fetch("/api/project-interests?status=pending");
+        const result = await response.json();
+        
+        if (result.ok && result.data) {
+          console.log("✅ Fetched interests:", result.data);
+          setProjectInterests(result.data);
+        } else {
+          console.warn("⚠️  Failed to fetch:", result.message);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching interests:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInterests();
+    
+    // Refresh every 5 seconds to show new requests
+    const interval = setInterval(fetchInterests, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleApprove = async (interestId: string, projectId: string, userId: string) => {
+    try {
+      const response = await fetch("/api/project-interests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          interestId,
+          status: "approved",
+          projectId,
+          userId,
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.ok) {
+        alert("✅ Approved!");
+        // Remove from list
+        setProjectInterests((prev) => prev.filter((r) => r.id !== interestId));
+      } else {
+        alert(`Failed: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("Failed to approve");
+    }
   };
 
-  const handleHold = (requestId: string) => {
-    alert("⏸️  On hold (Demo mode)");
+  const handleHold = async (interestId: string) => {
+    alert("⏸️  On hold (will implement status change)");
   };
 
   return (
@@ -40,37 +107,50 @@ const AdminPage = () => {
           Project Join Requests
         </h2>
         <span className="rounded-full bg-emerald-400/10 px-3 py-1 text-xs text-emerald-400">
-          {projectInterestRequests.filter((r) => r.status === "pending").length} pending
+          {loading ? "..." : `${projectInterests.length} pending`}
         </span>
       </div>
 
-      {projectInterestRequests.length > 0 ? (
+      {loading ? (
+        <div className="rounded-3xl border border-white/10 bg-black/40 p-8 text-center text-sm text-white/60">
+          Loading requests...
+        </div>
+      ) : projectInterests.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2">
-          {projectInterestRequests
-            .filter((r) => r.status === "pending")
-            .map((request) => (
+          {projectInterests.map((request) => (
               <div
                 key={request.id}
                 className="rounded-3xl border border-white/10 bg-black/40 p-6"
               >
                 <div className="mb-4">
                   <p className="text-sm uppercase tracking-[0.3em] text-emerald-200">
-                    {request.projectName}
+                    {request.projectName || `Project: ${request.projectId}`}
                   </p>
                   <h3 className="mt-2 text-xl font-semibold text-white">
-                    {request.userName}
+                    {request.userName || `User: ${request.userId}`}
                   </h3>
-                  <p className="text-sm text-white/60">{request.userEmail}</p>
+                  <p className="text-sm text-white/60">
+                    {request.userEmail || "No email available"}
+                  </p>
                 </div>
 
                 <div className="mb-4 flex items-center gap-2 text-xs text-white/50">
-                  <span>Requested {request.requestedAt}</span>
+                  <span>
+                    Requested{" "}
+                    {request.createdAt
+                      ? new Date(
+                          request.createdAt.toDate
+                            ? request.createdAt.toDate()
+                            : request.createdAt
+                        ).toLocaleDateString()
+                      : "recently"}
+                  </span>
                 </div>
 
                 <div className="flex gap-3">
                   <button
                     className="flex-1 rounded-full bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-400 transition hover:bg-emerald-400/20"
-                    onClick={() => handleApprove(request.id, request.userName)}
+                    onClick={() => handleApprove(request.id, request.projectId, request.userId)}
                   >
                     <CheckCircle className="inline h-4 w-4 mr-1" />
                     Approve

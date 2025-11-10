@@ -16,6 +16,7 @@ type ProjectInterest = {
   createdAt?: any;
   userName?: string;
   userEmail?: string;
+  projectName?: string;
 };
 
 const ManageProjectPage = () => {
@@ -32,6 +33,7 @@ const ManageProjectPage = () => {
   useEffect(() => {
     const fetchInterests = async () => {
       try {
+        console.log("🔄 Fetching interests for project:", projectId);
         const response = await fetch(`/api/project-interests?projectId=${projectId}&status=pending`);
         const result = await response.json();
         
@@ -40,9 +42,11 @@ const ManageProjectPage = () => {
           setLocalRequests(result.data);
         } else {
           console.warn("⚠️  Failed to fetch interests:", result.message);
+          setLocalRequests([]); // Set empty array on error
         }
       } catch (error) {
         console.error("❌ Error fetching interests:", error);
+        setLocalRequests([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -50,6 +54,9 @@ const ManageProjectPage = () => {
 
     if (projectId) {
       fetchInterests();
+      // Auto-refresh every 5 seconds to show new requests
+      const interval = setInterval(fetchInterests, 5000);
+      return () => clearInterval(interval);
     }
   }, [projectId]);
 

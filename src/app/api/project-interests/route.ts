@@ -23,18 +23,74 @@ export async function GET(request: Request) {
     }
     
     const snapshot = await query.get();
-    const interests = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const interests = await Promise.all(
+      snapshot.docs.map(async (doc) => {
+        const data = doc.data();
+        
+        // Try to fetch project details, fallback to projectId
+        let projectName = data.projectId || "Unknown Project";
+        try {
+          // First try by document ID
+          const projectDoc = await db.collection("projects").doc(data.projectId).get();
+          if (projectDoc.exists) {
+            projectName = projectDoc.data()?.title || projectName;
+          } else {
+            // Try to find by matching ID field
+            const projectQuery = await db.collection("projects")
+              .where("id", "==", data.projectId)
+              .limit(1)
+              .get();
+            if (!projectQuery.empty) {
+              projectName = projectQuery.docs[0].data()?.title || projectName;
+            }
+          }
+        } catch (err) {
+          console.warn("⚠️  Could not fetch project details:", err);
+        }
+        
+        // Try to fetch user details, fallback to userId
+        let userName = data.userId || "Unknown User";
+        let userEmail = "";
+        try {
+          // First try by document ID
+          const userDoc = await db.collection("members").doc(data.userId).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            userName = userData?.name || userName;
+            userEmail = userData?.email || "";
+          } else {
+            // Try to find by matching ID field
+            const userQuery = await db.collection("members")
+              .where("id", "==", data.userId)
+              .limit(1)
+              .get();
+            if (!userQuery.empty) {
+              const userData = userQuery.docs[0].data();
+              userName = userData?.name || userName;
+              userEmail = userData?.email || "";
+            }
+          }
+        } catch (err) {
+          console.warn("⚠️  Could not fetch user details:", err);
+        }
+        
+        return {
+          id: doc.id,
+          ...data,
+          projectName,
+          userName,
+          userEmail,
+        };
+      })
+    );
     
-    console.log(`✅ Fetched ${interests.length} project interests`);
+    console.log(`✅ Fetched ${interests.length} project interests with details`);
     return NextResponse.json({ 
       ok: true, 
       data: interests 
     });
   } catch (error) {
-    console.warn("⚠️  Failed to fetch project interests:", String(error));
+    console.error("❌ Failed to fetch project interests:", error);
     return NextResponse.json({ 
       ok: false, 
       message: "Failed to fetch interests",
