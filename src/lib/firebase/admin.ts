@@ -24,7 +24,7 @@ const getServiceAccount = (): ServiceAccount | null => {
       console.log("📋 Project ID from parsed JSON:", parsed.project_id);
       return {
         projectId: parsed.project_id,
-        privateKey: parsed.private_key,
+        privateKey: parsed.private_key.replace(/\\n/g, '\n'), // Convert escaped newlines to actual newlines
         clientEmail: parsed.client_email,
       } as ServiceAccount;
     } catch (error) {
