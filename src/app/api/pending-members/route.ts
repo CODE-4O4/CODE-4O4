@@ -71,9 +71,15 @@ export async function PATCH(request: Request) {
     
     const memberData = pendingMemberDoc.data();
     
+    let userId = null;
+    let tempPassword = null;
+    
     if (decision === "approved") {
       // Create a unique user ID
-      const userId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      userId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Generate a temporary password
+      tempPassword = `Club@${Math.random().toString(36).substr(2, 8)}`;
       
       // Add to members collection
       await db.collection("members").doc(userId).set({
@@ -93,9 +99,10 @@ export async function PATCH(request: Request) {
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${memberData?.email || userId}`,
         joinedAt: serverTimestamp(),
         approvedBy: adminId || "admin",
+        tempPassword, // Store temporarily for admin to send
       });
       
-      console.log("✅ Added to members collection");
+      console.log("✅ Added to members collection with ID:", userId);
     }
     
     // Record admin decision
@@ -118,6 +125,8 @@ export async function PATCH(request: Request) {
     return NextResponse.json({
       ok: true,
       message: `Member ${decision}!`,
+      ...(userId && { userId }),
+      ...(tempPassword && { tempPassword }),
     });
   } catch (error) {
     console.error("❌ Error processing member:", error);

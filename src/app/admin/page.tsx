@@ -93,8 +93,8 @@ const AdminPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleApproveMember = async (memberId: string) => {
-    if (!confirm("Approve this member to join the club?")) return;
+  const handleApproveMember = async (memberId: string, memberEmail: string, memberName: string) => {
+    if (!confirm(`Approve ${memberName} to join the club?`)) return;
     
     try {
       const response = await fetch("/api/pending-members", {
@@ -110,7 +110,25 @@ const AdminPage = () => {
       const result = await response.json();
       
       if (result.ok) {
-        alert("✅ Member approved and added to club!");
+        const userId = result.userId || memberId;
+        const tempPassword = result.tempPassword || "Welcome@123";
+        
+        // Show credentials that need to be sent to the member
+        const message = `✅ Member Approved!\n\n` +
+          `Name: ${memberName}\n` +
+          `Email: ${memberEmail}\n` +
+          `User ID: ${userId}\n` +
+          `Temporary Password: ${tempPassword}\n\n` +
+          `Please send these credentials to the member via email.`;
+        
+        alert(message);
+        
+        // Copy credentials to clipboard
+        const credentials = `User ID: ${userId}\nTemporary Password: ${tempPassword}`;
+        navigator.clipboard.writeText(credentials).then(() => {
+          console.log("📋 Credentials copied to clipboard");
+        });
+        
         setPendingMembers((prev) => prev.filter((m) => m.id !== memberId));
       } else {
         alert(`Failed: ${result.message}`);
@@ -285,7 +303,7 @@ const AdminPage = () => {
                 <div className="flex gap-3">
                   <button
                     className="flex-1 rounded-full bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-400 transition hover:bg-emerald-400/20"
-                    onClick={() => handleApproveMember(member.id)}
+                    onClick={() => handleApproveMember(member.id, member.email, member.name)}
                   >
                     <CheckCircle className="inline h-4 w-4 mr-1" />
                     Approve & Add to Club
