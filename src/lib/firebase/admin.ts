@@ -16,7 +16,32 @@ const getServiceAccount = (): ServiceAccount | null => {
     vercel: process.env.VERCEL,
   });
 
-  // PRIORITY 1: Try FIREBASE_SERVICE_ACCOUNT JSON (most reliable for Vercel)
+  // PRIORITY 1: Try individual environment variables (most reliable)
+  const projectId = process.env.FIREBASE_PROJECT_ID?.trim();
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
+  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+  if (projectId && clientEmail && privateKey) {
+    console.log("✅ Using individual Firebase environment variables");
+
+    // Handle escaped newlines in private key
+    // The private key might have literal \n strings that need to be converted to actual newlines
+    privateKey = privateKey.replace(/\\n/g, '\n');
+
+    // Verify the private key format
+    if (!privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+      console.error("❌ Private key doesn't have proper PEM header");
+      console.error("First 50 chars:", privateKey.substring(0, 50));
+    }
+
+    return {
+      projectId,
+      clientEmail,
+      privateKey,
+    } as ServiceAccount;
+  }
+
+  // PRIORITY 2: Fallback to FIREBASE_SERVICE_ACCOUNT JSON (less reliable)
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
       console.log("📝 Attempting to parse FIREBASE_SERVICE_ACCOUNT...");
@@ -32,31 +57,6 @@ const getServiceAccount = (): ServiceAccount | null => {
       console.error("❌ Failed to parse FIREBASE_SERVICE_ACCOUNT:", error);
       console.error("First 100 chars:", process.env.FIREBASE_SERVICE_ACCOUNT?.substring(0, 100));
     }
-  }
-
-  // PRIORITY 2: Fallback to individual environment variables
-  const projectId = process.env.FIREBASE_PROJECT_ID?.trim();
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
-  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
-  
-  if (projectId && clientEmail && privateKey) {
-    console.log("✅ Using individual Firebase environment variables");
-    
-    // Handle escaped newlines in private key
-    // The private key might have literal \n strings that need to be converted to actual newlines
-    privateKey = privateKey.replace(/\\n/g, '\n');
-    
-    // Verify the private key format
-    if (!privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
-      console.error("❌ Private key doesn't have proper PEM header");
-      console.error("First 50 chars:", privateKey.substring(0, 50));
-    }
-    
-    return {
-      projectId,
-      clientEmail,
-      privateKey,
-    } as ServiceAccount;
   }
   
   console.error("❌ No Firebase credentials found in environment variables");
