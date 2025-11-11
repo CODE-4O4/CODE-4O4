@@ -71,55 +71,17 @@ const readCache = (key: string) => {
 export default function DashboardPage() {
   const { user, logout } = useAuth();
   const [projects, setProjects] = useState<ShowcaseProject[]>([]);
-  const [userProjects, setUserProjects] = useState<any[]>([]);
-  const [upcomingSessions, setUpcomingSessions] = useState<any[]>([]);
-  const [stats, setStats] = useState({
-    activeProjects: 0,
-    upcomingSessions: 0,
-    points: 0,
-    badges: 0,
-  });
   const [loadingProjects, setLoadingProjects] = useState(true);
-  const [loadingDashboard, setLoadingDashboard] = useState(true);
   const [projectStatus, setProjectStatus] = useState<Record<string, string>>(() =>
     readCache(STORAGE_KEYS.projects),
   );
   const [eventStatus, setEventStatus] = useState<Record<string, string>>(() =>
     readCache(STORAGE_KEYS.events),
   );
+  const [adminDecisions, setAdminDecisions] = useState<Record<string, string>>(
+    {},
+  );
   const [toast, setToast] = useState<string | null>(null);
-
-  // Fetch user-specific dashboard data
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (!user?.id) {
-        setLoadingDashboard(false);
-        return;
-      }
-
-      try {
-        console.log("🔄 Fetching dashboard data for user:", user.id);
-        const response = await fetch(`/api/dashboard?userId=${user.id}`);
-        const result = await response.json();
-        
-        if (result.ok && result.data) {
-          console.log("✅ Dashboard data:", result.data);
-          setStats(result.data.stats);
-          setUserProjects(result.data.projects || []);
-          setUpcomingSessions(result.data.sessions || []);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching dashboard data:", error);
-      } finally {
-        setLoadingDashboard(false);
-      }
-    };
-
-    fetchDashboardData();
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchDashboardData, 30000);
-    return () => clearInterval(interval);
-  }, [user?.id]);
 
   // Fetch projects from Firebase
   useEffect(() => {
@@ -153,11 +115,11 @@ export default function DashboardPage() {
 
   const profile = useMemo(
     () => ({
-      points: stats.points || user?.points || 0,
-      badges: stats.badges || user?.badges || 0,
+      points: user?.points ?? 1250,
+      badges: user?.badges ?? 4,
       role: user?.role ?? "student",
     }),
-    [user, stats],
+    [user],
   );
 
   // Log user info for debugging
@@ -194,13 +156,15 @@ export default function DashboardPage() {
     setTimeout(() => setToast(null), 2500);
   };
 
-  // Dynamic stat cards based on user data
-  const dynamicStatCards = useMemo(() => [
-    { label: "Active Projects", value: stats.activeProjects, icon: Layers, tone: "emerald" },
-    { label: "Upcoming Sessions", value: stats.upcomingSessions, icon: Clock, tone: "indigo" },
-    { label: "Your Points", value: stats.points, icon: Trophy, tone: "amber" },
-    { label: "Badges Earned", value: stats.badges, icon: CheckCircle, tone: "purple" },
-  ], [stats]);
+  const handleDecision = (requestId: string, decision: "approve" | "hold") => {
+    setAdminDecisions((prev) => ({ ...prev, [requestId]: decision }));
+    setToast(
+      decision === "approve"
+        ? "Member approved successfully."
+        : "Request moved to review queue.",
+    );
+    setTimeout(() => setToast(null), 2500);
+  };
 
   return (
     <div className="min-h-screen bg-[#010107] pb-16 text-white">
@@ -270,166 +234,14 @@ export default function DashboardPage() {
             </div>
           )}
 
-          <section className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-            {dynamicStatCards.map((card) => (
+          <section className="grid gap-4 grid-cols-2 lg:grid-cols-5">
+            {statCards.map((card) => (
               <div
                 key={card.label}
                 className={`rounded-3xl border border-white/10 bg-gradient-to-br ${toneMap[card.tone]} p-4`}
               >
                 <card.icon className="h-5 w-5" />
                 <p className="mt-4 text-3xl font-semibold">{card.value}</p>
-                <p className="text-sm text-white/70">{card.label}</p>
-              </div>
-            ))}
-          </section>
-
-          <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm uppercase tracking-[0.3em] text-emerald-200">
-                    Your projects
-                  </p>
-                  <h2 className="text-2xl font-semibold">Active work</h2>
-                </div>
-                <div className="flex gap-2">
-                  <Link
-                    href="/dashboard/projects/create"
-                    className="flex items-center gap-1 rounded-full bg-gradient-to-r from-[#00f5c4] to-[#00c2ff] px-4 py-2 text-sm font-medium text-black transition hover:opacity-90"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Create</span>
-                  </Link>
-                  <Link
-                    href="/projects"
-                    className="rounded-full border border-white/15 px-4 py-2 text-sm text-white/80 transition hover:border-emerald-300 hover:text-white"
-                  >
-                    View all
-                  </Link>
-              </div>
-            </div>
-            <div className="mt-6 space-y-4">
-                {loadingDashboard ? (
-                  <div className="text-center text-white/60 py-8">
-                    Loading your projects...
-                  </div>
-                ) : userProjects.length === 0 ? (
-                  <div className="text-center text-white/60 py-8">
-                    <p className="mb-4">You're not part of any projects yet.</p>
-                    <Link
-                      href="/projects"
-                      className="text-emerald-400 hover:text-emerald-300 underline"
-                    >
-                      Browse available projects →
-                    </Link>
-                  </div>
-                ) : (
-                  userProjects.map((project) => (
-                  <div
-                    key={project.id}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-5"
-                  >
-                    <div className="flex flex-wrap items-center gap-3">
-                      <p className="text-lg font-semibold">{project.title}</p>
-                      {project.tech && (
-                        <span className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/60">
-                          {Array.isArray(project.tech) ? project.tech.join(" · ") : project.tech}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-2 text-sm text-white/60">
-                      {project.description}
-                    </p>
-                    <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-white/60">
-                      {project.members && (
-                        <span className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          {project.members} members
-                        </span>
-                      )}
-                      {project.status && (
-                        <span className="uppercase tracking-[0.3em] text-white/40">
-                          {project.status}
-                        </span>
-                      )}
-                    </div>
-                    {user && (project.ownerId === user.id || (project.owner && project.owner.startsWith(user.name))) ? (
-                      <Link
-                        href={`/dashboard/projects/${project.id}/manage`}
-                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#00f5c4] to-[#00c2ff] px-4 py-2 text-sm font-medium text-black transition hover:opacity-90"
-                      >
-                        <Settings className="h-4 w-4" />
-                        Manage Project
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/projects/${project.id}`}
-                        className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm text-white/80 transition hover:border-emerald-300 hover:text-white"
-                      >
-                        View Details
-                      </Link>
-                    )}
-                  </div>
-                ))
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm uppercase tracking-[0.3em] text-emerald-200">
-                      Sessions
-                    </p>
-                    <h2 className="text-2xl font-semibold">Upcoming schedule</h2>
-                  </div>
-                  <Link
-                    href="/sessions"
-                    className="rounded-full border border-white/15 px-4 py-2 text-sm text-white/80 transition hover:border-emerald-300 hover:text-white"
-                  >
-                    View calendar
-                  </Link>
-                </div>
-                <div className="mt-5 space-y-4">
-                  {loadingDashboard ? (
-                    <div className="text-center text-white/60 py-4">
-                      Loading sessions...
-                    </div>
-                  ) : upcomingSessions.length === 0 ? (
-                    <div className="text-center text-white/60 py-4">
-                      No upcoming sessions scheduled.
-                    </div>
-                  ) : (
-                    upcomingSessions.map((session) => (
-                      <div
-                        key={session.id}
-                        className="rounded-2xl border border-white/10 bg-white/5 p-4"
-                      >
-                        <div className="flex items-center justify-between text-xs text-white/60">
-                          <span>{session.date}</span>
-                          <span className="uppercase tracking-[0.3em]">
-                            {session.type || "SESSION"}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-base font-semibold">
-                          {session.title}
-                        </p>
-                        {session.description && (
-                          <p className="text-sm text-white/60">{session.description}</p>
-                        )}
-                        {session.location && (
-                          <div className="mt-3 text-xs text-white/60">
-                            <span>{session.location}</span>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          </section>
                 <p className="text-sm text-white/70">{card.label}</p>
               </div>
             ))}
