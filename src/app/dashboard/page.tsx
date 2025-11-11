@@ -194,7 +194,7 @@ export default function DashboardPage() {
       <div className="mx-auto flex max-w-6xl gap-6 px-4 pt-10 sm:px-6 lg:px-8">
         <aside className="hidden w-56 flex-col gap-6 rounded-3xl border border-white/10 bg-black/40 p-6 md:flex">
           <div>
-            <p className="text-lg font-semibold">NSTSWC Dev Club</p>
+            <p className="text-lg font-semibold">CODE 4O4 Dev Club</p>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">
               Portal
             </p>

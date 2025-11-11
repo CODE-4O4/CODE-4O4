@@ -36,7 +36,7 @@ export const JoinClubModal = ({ open, onClose }: ModalProps) => (
           </button>
           <div className="mb-6 space-y-2">
             <span className="inline-flex items-center rounded-full border border-emerald-400/30 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-              Join NSTSWC Dev Club
+              Join CODE 4O4 Dev Club
             </span>
             <h3 className="text-3xl font-semibold">
               Tell us how you want to collaborate
