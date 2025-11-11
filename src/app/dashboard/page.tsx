@@ -94,8 +94,8 @@ export default function DashboardPage() {
     };
 
     fetchDashboardData();
-    const interval = setInterval(fetchDashboardData, 30000);
-    return () => clearInterval(interval);
+    // Removed auto-refresh to save Firebase reads
+    // Dashboard will only load on page refresh or navigation
   }, [user?.id]);
 
   // Fetch projects from Firebase (only on page load)
