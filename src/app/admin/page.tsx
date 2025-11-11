@@ -79,9 +79,8 @@ const AdminPage = () => {
 
     fetchPendingMembers();
     
-    // Refresh every 5 seconds
-    const interval = setInterval(fetchPendingMembers, 5000);
-    return () => clearInterval(interval);
+    // Removed auto-refresh to save Firebase reads
+    // Admins can refresh page manually to see new requests
   }, []);
 
   // Fetch project interests from Firestore
@@ -107,9 +106,8 @@ const AdminPage = () => {
 
     fetchInterests();
     
-    // Refresh every 5 seconds to show new requests
-    const interval = setInterval(fetchInterests, 5000);
-    return () => clearInterval(interval);
+    // Removed auto-refresh to save Firebase reads
+    // Admins can refresh page manually to see new requests
   }, []);
 
   const handleApproveMember = async (memberId: string, memberEmail: string, memberName: string) => {

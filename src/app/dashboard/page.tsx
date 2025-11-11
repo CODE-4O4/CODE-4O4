@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CalendarDays,
@@ -52,7 +53,8 @@ const readCache = (key: string) => {
 };
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  const router = useRouter();
+  const { user, logout, isAuthenticated } = useAuth();
   const [projects, setProjects] = useState<ShowcaseProject[]>([]);
   const [userProjects, setUserProjects] = useState<any[]>([]);
   const [upcomingSessions, setUpcomingSessions] = useState<any[]>([]);
@@ -66,6 +68,14 @@ export default function DashboardPage() {
   const [projectStatus, setProjectStatus] = useState<Record<string, string>>(() =>
     readCache(STORAGE_KEYS.projects),
   );
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      console.log("🔒 Not authenticated, redirecting to home");
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
 
   // Fetch user-specific dashboard data
   useEffect(() => {

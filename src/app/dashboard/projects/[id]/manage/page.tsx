@@ -75,63 +75,57 @@ const ManageProjectPage = () => {
     }
   }, [projectId]);
 
-    // Fetch project interests from Firestore
-  useEffect(() => {
-    const fetchInterests = async () => {
-      try {
-        console.log("🔄 Fetching interests for project:", projectId);
-        const response = await fetch(`/api/project-interests?projectId=${projectId}&status=pending`);
-        const result = await response.json();
-        
-        if (result.ok && result.data) {
-          console.log("✅ Fetched project interests:", result.data);
-          setLocalRequests(result.data);
-        } else {
-          console.warn("⚠️  Failed to fetch interests:", result.message);
-          setLocalRequests([]); // Set empty array on error
-        }
-      } catch (error) {
-        console.error("❌ Error fetching interests:", error);
+  // Fetch project interests from Firestore
+  const fetchInterests = async () => {
+    try {
+      console.log("🔄 Fetching interests for project:", projectId);
+      const response = await fetch(`/api/project-interests?projectId=${projectId}&status=pending`);
+      const result = await response.json();
+      
+      if (result.ok && result.data) {
+        console.log("✅ Fetched project interests:", result.data);
+        setLocalRequests(result.data);
+      } else {
+        console.warn("⚠️  Failed to fetch interests:", result.message);
         setLocalRequests([]); // Set empty array on error
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("❌ Error fetching interests:", error);
+      setLocalRequests([]); // Set empty array on error
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (projectId) {
       fetchInterests();
-      // Auto-refresh every 5 seconds to show new requests
-      const interval = setInterval(fetchInterests, 5000);
-      return () => clearInterval(interval);
     }
   }, [projectId]);
 
   // Fetch current project members
-  useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        console.log("🔄 Fetching members for project:", projectId);
-        const response = await fetch(`/api/project-members?projectId=${projectId}`);
-        const result = await response.json();
-        
-        if (result.ok && result.data) {
-          console.log("✅ Fetched project members:", result.data);
-          setMembers(result.data);
-        } else {
-          console.warn("⚠️  Failed to fetch members:", result.message);
-          setMembers([]);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching members:", error);
+  const fetchMembers = async () => {
+    try {
+      console.log("🔄 Fetching members for project:", projectId);
+      const response = await fetch(`/api/project-members?projectId=${projectId}`);
+      const result = await response.json();
+      
+      if (result.ok && result.data) {
+        console.log("✅ Fetched project members:", result.data);
+        setMembers(result.data);
+      } else {
+        console.warn("⚠️  Failed to fetch members:", result.message);
         setMembers([]);
       }
-    };
+    } catch (error) {
+      console.error("❌ Error fetching members:", error);
+      setMembers([]);
+    }
+  };
 
+  useEffect(() => {
     if (projectId) {
       fetchMembers();
-      // Auto-refresh every 10 seconds
-      const interval = setInterval(fetchMembers, 10000);
-      return () => clearInterval(interval);
     }
   }, [projectId]);
 
@@ -183,7 +177,9 @@ const ManageProjectPage = () => {
       if (data.ok) {
         console.log("✅ Approved and deleted request:", interestId);
         alert("✅ User approved to join the project!");
-        // fetchInterests will be called automatically by the interval
+        // Manually refresh lists after approval
+        await fetchInterests();
+        await fetchMembers();
       }
     } catch (error) {
       console.error("Failed to approve:", error);
@@ -208,7 +204,8 @@ const ManageProjectPage = () => {
       if (data.ok) {
         console.log("❌ Rejected and deleted request:", interestId);
         alert("❌ Request rejected");
-        // fetchInterests will be called automatically by the interval
+        // Manually refresh after rejection
+        await fetchInterests();
       }
     } catch (error) {
       console.error("Failed to reject:", error);
@@ -233,7 +230,8 @@ const ManageProjectPage = () => {
       if (data.ok) {
         console.log("✅ Member removed:", memberId);
         alert(`✅ ${memberName} has been removed from the project`);
-        // Members will be refetched automatically by the interval
+        // Manually refresh members list after removal
+        await fetchMembers();
       } else {
         alert("❌ Failed to remove member: " + data.message);
       }
@@ -483,8 +481,13 @@ const ManageProjectPage = () => {
                     className="rounded-2xl border border-white/10 bg-white/5 p-5"
                   >
                     <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold">{request.userName || request.userId}</h3>
+                      <div className="flex-1">
+                        <button
+                          onClick={() => setSelectedMemberId(request.userId)}
+                          className="text-left transition hover:text-emerald-400"
+                        >
+                          <h3 className="text-lg font-semibold hover:underline">{request.userName || request.userId}</h3>
+                        </button>
                         <p className="text-sm text-white/60">{request.userEmail || "No email"}</p>
                         <p className="mt-2 text-xs text-white/50">
                           Requested {request.createdAt ? new Date(request.createdAt.toDate ? request.createdAt.toDate() : request.createdAt).toLocaleDateString() : "recently"}

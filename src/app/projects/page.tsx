@@ -54,9 +54,8 @@ const ProjectsPage = () => {
     };
 
     fetchProjects();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchProjects, 30000);
-    return () => clearInterval(interval);
+    // Removed auto-refresh to save Firebase reads
+    // Users can refresh page manually to see project updates
   }, []);
 
   const handleJoin = async (projectId: string) => {

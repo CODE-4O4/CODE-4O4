@@ -29,17 +29,30 @@ export async function GET(request: Request) {
 
     const memberData = memberDoc.data();
 
-    // Get user's projects (where they are a member)
+    // Get user's projects - both as member and as owner
+    // 1. Get projects where user is a member
     const projectMembersQuery = await db
       .collection("projectMembers")
       .where("userId", "==", userId)
       .get();
 
-    const projectIds = projectMembersQuery.docs.map(doc => doc.data().projectId);
+    const memberProjectIds = projectMembersQuery.docs.map(doc => doc.data().projectId);
     
-    let userProjects: any[] = [];
-    if (projectIds.length > 0) {
-      const projectsPromises = projectIds.map(async (projectId) => {
+    // 2. Get projects where user is the owner
+    const ownedProjectsQuery = await db
+      .collection("projects")
+      .where("ownerId", "==", userId)
+      .get();
+
+    const ownedProjects = ownedProjectsQuery.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // 3. Get member project details
+    let memberProjects: any[] = [];
+    if (memberProjectIds.length > 0) {
+      const projectsPromises = memberProjectIds.map(async (projectId) => {
         const projectDoc = await db.collection("projects").doc(projectId).get();
         if (projectDoc.exists) {
           return { id: projectDoc.id, ...projectDoc.data() };
@@ -47,8 +60,17 @@ export async function GET(request: Request) {
         return null;
       });
       const projectsResults = await Promise.all(projectsPromises);
-      userProjects = projectsResults.filter(p => p !== null);
+      memberProjects = projectsResults.filter(p => p !== null);
     }
+
+    // Combine owned and member projects, remove duplicates by id
+    const allProjectsMap = new Map();
+    [...ownedProjects, ...memberProjects].forEach(project => {
+      if (project && !allProjectsMap.has(project.id)) {
+        allProjectsMap.set(project.id, project);
+      }
+    });
+    const userProjects = Array.from(allProjectsMap.values());
 
     // Get upcoming sessions (next 5)
     const now = new Date();

@@ -41,7 +41,7 @@ export default function MemberProfileModal({ userId, onClose }: MemberProfileMod
           throw new Error("Failed to fetch profile");
         }
         const data = await res.json();
-        setProfile(data.profile);
+        setProfile(data.data);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load member profile");

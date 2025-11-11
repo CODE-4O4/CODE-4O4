@@ -95,6 +95,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       window.localStorage.removeItem(STORAGE_KEY);
       // Remove cookie
       document.cookie = "code404-user=; path=/; max-age=0";
+      // Redirect to home page
+      window.location.href = "/";
     }
   }, []);
 

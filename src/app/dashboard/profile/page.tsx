@@ -43,7 +43,7 @@ type UserProfile = {
 };
 
 export default function ProfilePage() {
-  const { user, logout, updateUser } = useAuth();
+  const { user, logout, updateUser, isAuthenticated } = useAuth();
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
@@ -52,6 +52,14 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      console.log("🔒 Not authenticated, redirecting to home");
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
 
   useEffect(() => {
     const fetchProfile = async () => {
