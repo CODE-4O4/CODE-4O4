@@ -27,33 +27,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save FCM token to user's document
-    const userRef = db.collection("members").doc(userId);
-    const userDoc = await userRef.get();
+    console.log(`📱 Subscribing user ${userId} with token:`, token.substring(0, 20) + "...");
 
-    if (!userDoc.exists) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Get existing tokens or create empty array
-    const userData = userDoc.data();
-    const existingTokens = userData?.fcmTokens || [];
-
-    // Add new token if it doesn't exist
-    if (!existingTokens.includes(token)) {
-      await userRef.update({
-        fcmTokens: [...existingTokens, token],
-        lastTokenUpdate: serverTimestamp(),
-      });
-    }
-
-    // Create notification subscription record
-    await db.collection("notificationSubscriptions").doc(token).set({
+    // Save to fcmTokens collection (for easy querying by userId)
+    await db.collection("fcmTokens").doc(token).set({
       userId,
       token,
       subscribedAt: serverTimestamp(),
       active: true,
+      deviceInfo: {
+        userAgent: request.headers.get("user-agent") || "unknown",
+        lastSeen: serverTimestamp(),
+      }
     });
+
+    // Also save FCM token to user's document (for backup)
+    const userRef = db.collection("members").doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      console.warn(`⚠️ User ${userId} not found in members collection`);
+      // Don't fail - still allow notification subscription
+    } else {
+      // Get existing tokens or create empty array
+      const userData = userDoc.data();
+      const existingTokens = userData?.fcmTokens || [];
+
+      // Add new token if it doesn't exist
+      if (!existingTokens.includes(token)) {
+        await userRef.update({
+          fcmTokens: [...existingTokens, token],
+          lastTokenUpdate: serverTimestamp(),
+        });
+      }
+    }
+
+    console.log(`✅ Successfully subscribed user ${userId} to notifications`);
 
     return NextResponse.json({
       success: true,

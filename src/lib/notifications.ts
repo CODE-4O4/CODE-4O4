@@ -87,8 +87,15 @@ export async function subscribeToNotifications(
   vapidKey?: string
 ): Promise<boolean> {
   try {
+    console.log("🔔 Starting notification subscription for user:", userId);
+    
     const token = await getFCMToken(vapidKey);
-    if (!token) return false;
+    if (!token) {
+      console.error("❌ Failed to get FCM token");
+      return false;
+    }
+
+    console.log("📱 Got FCM token, saving to backend...");
 
     // Save token to backend
     const response = await fetch("/api/notifications/subscribe", {
@@ -97,14 +104,17 @@ export async function subscribeToNotifications(
       body: JSON.stringify({ userId, token }),
     });
 
+    const result = await response.json();
+
     if (!response.ok) {
-      throw new Error("Failed to save FCM token");
+      console.error("❌ Backend subscription failed:", result);
+      throw new Error(result.error || "Failed to save FCM token");
     }
 
-    console.log("Successfully subscribed to notifications");
+    console.log("✅ Successfully subscribed to notifications:", result);
     return true;
   } catch (error) {
-    console.error("Error subscribing to notifications:", error);
+    console.error("❌ Error subscribing to notifications:", error);
     return false;
   }
 }

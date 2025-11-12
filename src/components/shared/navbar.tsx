@@ -114,33 +114,29 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile: Floating Action Buttons - Bottom Right */}
-      <div className="lg:hidden fixed bottom-6 right-4 z-50 flex flex-col gap-3">
-        {/* Notification Button */}
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="bg-gray-900 border border-white/20 rounded-full p-3 shadow-lg backdrop-blur-sm"
-        >
-          <NotificationBell />
-        </motion.div>
-
-        {/* Menu Button */}
-        <motion.button
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+      {/* Mobile: Top Bar with Menu and Notification */}
+      <div className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-black/95 backdrop-blur-sm border-b border-white/10">
+        {/* Menu Button - Left */}
+        <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-full p-4 shadow-lg transition-all duration-200 hover:shadow-cyan-500/50"
+          className="p-2 rounded-lg hover:bg-white/10 transition-colors"
           aria-label="Toggle menu"
         >
-          {isMobileMenuOpen ? (
-            <X className="w-6 h-6" />
-          ) : (
-            <Menu className="w-6 h-6" />
-          )}
-        </motion.button>
+          <Menu className="w-6 h-6 text-white" />
+        </button>
+
+        {/* Logo - Center */}
+        <Link 
+          href="/" 
+          className="tracking-[0.3em] font-semibold text-xs text-white hover:text-cyan-400 transition-colors"
+        >
+          CODE 4O4
+        </Link>
+
+        {/* Notification Bell - Right */}
+        <div className="flex items-center">
+          <NotificationBell />
+        </div>
       </div>
 
       {/* Mobile Sidebar Menu */}
@@ -156,13 +152,13 @@ export default function Navbar() {
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
             />
 
-            {/* Sidebar */}
+            {/* Sidebar - Slides from LEFT */}
             <motion.div
-              initial={{ x: "100%" }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-80 bg-gray-900 border-l border-white/10 z-50 lg:hidden overflow-y-auto"
+              className="fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-gray-900 border-r border-white/10 z-50 lg:hidden overflow-y-auto shadow-2xl"
             >
               <div className="flex flex-col h-full">
                 {/* Header */}

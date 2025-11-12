@@ -45,23 +45,33 @@ export function NotificationPrompt() {
   }, [user]);
 
   const handleEnable = async () => {
-    if (!user) return;
+    if (!user) {
+      console.error("❌ No user found");
+      return;
+    }
     
+    console.log("🔔 Starting notification enable process for user:", user.id);
     setIsSubscribing(true);
+    
     try {
+      console.log("1️⃣ Requesting notification permission...");
       const granted = await requestNotificationPermission();
+      console.log("   Permission granted:", granted);
       
       if (granted) {
-        // Subscribe to notifications
+        console.log("2️⃣ Subscribing to notifications...");
         const success = await subscribeToNotifications(user.id);
+        console.log("   Subscribe success:", success);
         
         if (success) {
+          console.log("✅ Notification setup complete!");
           // Show success message
           setShow(false);
           
           // Send welcome notification after a short delay
           setTimeout(() => {
             if ("Notification" in window && Notification.permission === "granted") {
+              console.log("🎉 Sending welcome notification");
               new Notification("🎉 Welcome to CODE 404!", {
                 body: "You'll now receive updates about events, projects, and club activities.",
                 icon: "/icon-192x192.png",
@@ -69,10 +79,17 @@ export function NotificationPrompt() {
               });
             }
           }, 1000);
+        } else {
+          console.error("❌ Failed to subscribe to notifications");
+          alert("Failed to enable notifications. Please try again.");
         }
+      } else {
+        console.warn("⚠️ Notification permission denied");
+        alert("Notification permission denied. You can enable it later from browser settings.");
       }
     } catch (error) {
-      console.error("Error enabling notifications:", error);
+      console.error("❌ Error enabling notifications:", error);
+      alert("An error occurred. Please check the console.");
     } finally {
       setIsSubscribing(false);
     }
