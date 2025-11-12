@@ -3,9 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
 
 const authedLinks = [
   { label: "Dashboard", href: "/dashboard" },
@@ -22,6 +24,7 @@ const adminLinks = [
 export const PageContainer = ({ children }: { children: ReactNode }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Show admin links for both admin and mentor roles
   const showAdminLinks = user?.role === "admin" || user?.role === "mentor";
