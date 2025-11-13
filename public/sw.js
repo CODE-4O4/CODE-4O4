@@ -5,21 +5,30 @@
 self.addEventListener('push', (event) => {
   try {
     const payload = event.data ? event.data.json() : {};
-    const title = payload.title || 'New notification';
+    // Provide a friendly default title
+    const title = payload.title || 'CODE 4O4';
+
+    // NotificationOptions supported keys: body, icon, badge, image, vibrate, actions, tag, renotify, requireInteraction, silent, data
     const options = {
       body: payload.body || undefined,
-      // Use the icons available in public/ (SVG assets); these match manifest entries.
-      // Prefer providing PNGs for best compatibility, but SVG works in most modern browsers.
-      icon: payload.icon || '/icon-192x192.svg',
-      badge: payload.badge || '/icon-72x72.svg',
+  icon: payload.icon || '/app-icon-192.png',
+  badge: payload.badge || '/app-icon-72.png',
+      image: payload.image || undefined,
+      // Vibrate pattern: array of numbers (ms). Many mobile browsers support this when device settings allow.
+      vibrate: payload.vibrate || [100, 50, 100],
       data: payload.data || {},
       renotify: payload.renotify || false,
       tag: payload.tag || undefined,
+      // keep notification visible until user interacts for high-priority alerts
+      requireInteraction: payload.requireInteraction || false,
+      // silent: true/false - note: some platforms ignore sound control and use system settings
+      silent: payload.silent || false,
+      // Actions: array of {action, title, icon}
+      actions: payload.actions || [],
     };
 
     event.waitUntil(self.registration.showNotification(title, options));
   } catch (err) {
-    // If the payload isn't JSON or another error happens, show a simple notification
     const title = 'New notification';
     event.waitUntil(self.registration.showNotification(title, {}));
   }
@@ -27,12 +36,41 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const clickUrl = (event.notification.data && event.notification.data.url) || '/';
+  const notificationData = event.notification.data || {};
+  const clickUrl = notificationData.url || '/';
+
+  // Handle action buttons (if any)
+  const action = event.action;
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async (clientList) => {
+      // If user clicked an action, handle it specially
+      if (action) {
+        // Example action handlers: 'reply', 'open', 'snooze', 'mark-read'
+        if (action === 'reply' && notificationData.replyUrl) {
+          if (clients.openWindow) return clients.openWindow(notificationData.replyUrl);
+        }
+        if (action === 'snooze' && notificationData.snoozeUrl) {
+          if (clients.openWindow) return clients.openWindow(notificationData.snoozeUrl);
+        }
+        if (action === 'mark-read' && notificationData.markReadApi) {
+          // Try to call an API route (fire-and-forget)
+          try {
+            await fetch(notificationData.markReadApi, { method: 'POST' });
+          } catch (e) {
+            // ignore
+          }
+        }
+      }
+
+      // Otherwise, focus an existing client or open a new one
       for (const client of clientList) {
-        if (client.url === clickUrl && 'focus' in client) {
-          return client.focus();
+        try {
+          const url = new URL(client.url);
+          if (url.pathname === new URL(clickUrl, self.location.origin).pathname && 'focus' in client) {
+            return client.focus();
+          }
+        } catch (e) {
+          // ignore parsing errors
         }
       }
       if (clients.openWindow) return clients.openWindow(clickUrl);
