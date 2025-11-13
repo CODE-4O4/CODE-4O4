@@ -124,7 +124,7 @@ export function NotificationDebugPanel() {
               if (permission === "granted") {
                 new Notification("🎉 Notifications Enabled!", {
                   body: "You'll now receive updates from CODE 404 Dev Club",
-                  icon: "/icon-192x192.png",
+                    icon: "/icon-192x192.svg",
                 });
                 // Refresh checks
                 window.location.reload();

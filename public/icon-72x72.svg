@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+<svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
-  <rect width="512" height="512" fill="#06b6d4" rx="102.4"/>
+  <rect width="72" height="72" fill="#06b6d4" rx="14.4"/>
   
   <!-- CODE text -->
   <text 
     x="50%" 
     y="40%" 
     font-family="system-ui, -apple-system, sans-serif" 
-    font-size="128" 
+    font-size="18" 
     font-weight="bold" 
     fill="white" 
     text-anchor="middle" 
@@ -19,7 +19,7 @@
     x="50%" 
     y="65%" 
     font-family="system-ui, -apple-system, sans-serif" 
-    font-size="143.36" 
+    font-size="20.160000000000004" 
     font-weight="bold" 
     fill="white" 
     text-anchor="middle" 

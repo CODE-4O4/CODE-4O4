@@ -10,57 +10,42 @@ import { Bell } from "lucide-react";
 export function NotificationTestButton() {
   const [testing, setTesting] = useState(false);
 
-  const testNotification = async () => {
-    setTesting(true);
-    
+    const testNotification = async () => {
+    if (!("Notification" in window)) {
+      alert("This browser does not support notifications");
+      return;
+    }
+
+    if (Notification.permission !== "granted") {
+      alert("Please enable notifications first");
+      return;
+    }
+
+    const notificationOptions = {
+      body: "This is a test notification from NST Dev Club! 🎉",
+      icon: "/icon-192x192.svg",
+      badge: "/icon-72x72.svg",
+      tag: "test-notification",
+      requireInteraction: false,
+    };
+
     try {
-      // Check if notifications are supported
-      if (!("Notification" in window)) {
-        alert("This browser doesn't support notifications");
-        return;
-      }
-
-      // Check permission
-      console.log("Current permission:", Notification.permission);
-      
-      if (Notification.permission === "granted") {
-        // Show test notification
-        console.log("🔔 Showing test notification...");
-        const notification = new Notification("🧪 Test Notification", {
-          body: "If you see this, notifications are working! 🎉",
-          icon: "/icon-192x192.png",
-          badge: "/icon-192x192.png",
-          tag: "test",
-          requireInteraction: false,
-          silent: false,
-        });
-
-        notification.onclick = () => {
-          console.log("Notification clicked!");
-          notification.close();
-        };
-
-        setTimeout(() => notification.close(), 5000);
-      } else if (Notification.permission === "denied") {
-        alert("Notifications are blocked. Please enable them in your browser settings:\n\n1. Click the lock icon in the address bar\n2. Find Notifications\n3. Change to Allow");
-      } else {
-        // Request permission
-        console.log("Requesting permission...");
-        const permission = await Notification.requestPermission();
-        console.log("Permission result:", permission);
-        
-        if (permission === "granted") {
-          new Notification("🎉 Notifications Enabled!", {
-            body: "You'll now receive updates from CODE 404 Dev Club",
-            icon: "/icon-192x192.png",
-          });
-        }
-      }
+      // Try direct Notification API first (works on iOS)
+      new Notification("Test Notification", notificationOptions);
     } catch (error) {
-      console.error("Error testing notification:", error);
-      alert("Error: " + (error instanceof Error ? error.message : String(error)));
-    } finally {
-      setTesting(false);
+      // Fallback to Service Worker API (required for Android)
+      console.log("Falling back to Service Worker notification:", error);
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          await registration.showNotification("Test Notification", notificationOptions);
+        } else {
+          alert("Service Worker not registered. Please refresh the page.");
+        }
+      } catch (swError) {
+        console.error("Service Worker notification failed:", swError);
+        alert("Failed to show notification. Please check console.");
+      }
     }
   };
 
