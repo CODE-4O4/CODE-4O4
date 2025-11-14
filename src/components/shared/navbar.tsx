@@ -157,7 +157,7 @@ export default function Navbar() {
         {/* Menu Button - Left (smaller) */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-md hover:bg-white/8 transition-colors"
+          className="p-2 rounded-md hover:bg-white/10 transition-colors"
           aria-label="Toggle menu"
         >
           <Menu className="w-5 h-5 text-white" />
@@ -209,7 +209,7 @@ export default function Navbar() {
               {/* Close Button (top) */}
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-white/8 mb-3"
+                className="p-2 rounded-md hover:bg-white/10 mb-3"
                 aria-label="Close menu"
               >
                 <X className="w-4 h-4 text-white" />
