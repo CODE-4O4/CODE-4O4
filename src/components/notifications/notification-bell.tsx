@@ -186,10 +186,6 @@ export default function NotificationBell({
   }, [open]);
 
   const toggleOpen = () => {
-    if (!user) {
-      router.push("/");
-      return;
-    }
     setOpen((prev) => !prev);
   };
 
@@ -222,10 +218,6 @@ export default function NotificationBell({
       router.push(notification.url);
     }
   };
-
-  if (!user) {
-    return null;
-  }
 
   const baseButtonClasses =
     "relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black";
@@ -316,6 +308,12 @@ export default function NotificationBell({
                 </button>
               </div>
             </div>
+
+            {!user && (
+              <p className="mt-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/70">
+                Notifications stay on this device. Log in to sync across sessions.
+              </p>
+            )}
 
             <div className="mt-4 max-h-80 space-y-3 overflow-y-auto pr-1">
               {notifications.length === 0 ? (

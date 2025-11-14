@@ -115,6 +115,8 @@ export default function Navbar({ showGuestCtas = false, onLogin, onJoin }: Navba
     return baseNavItems;
   }, [user?.role, isAuthenticated]);
 
+  const shouldShowBell = isAuthenticated || showGuestCtas;
+
   const handleLogout = () => {
     logout();
     setIsMobileMenuOpen(false);
@@ -181,9 +183,9 @@ export default function Navbar({ showGuestCtas = false, onLogin, onJoin }: Navba
               Install
             </button>
           )}
+          {shouldShowBell && <NotificationBell buttonVariant="solid" />}
           {isAuthenticated ? (
             <>
-              {/* Notifications removed: feature deprecated */}
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition hover:bg-white/5 hover:text-cyan-400"
@@ -238,16 +240,15 @@ export default function Navbar({ showGuestCtas = false, onLogin, onJoin }: Navba
           C404
         </Link>
         <div className="flex items-center gap-2">
-          {isAuthenticated ? null : (
-            showGuestCtas && (
-              <button
-                onClick={handleJoinClick}
-                className="flex items-center gap-1 rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white/80"
-              >
-                <UserPlus className="h-3.5 w-3.5" />
-                Join
-              </button>
-            )
+          {shouldShowBell && <NotificationBell buttonVariant="icon" />}
+          {!isAuthenticated && showGuestCtas && (
+            <button
+              onClick={handleJoinClick}
+              className="flex items-center gap-1 rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white/80"
+            >
+              <UserPlus className="h-3.5 w-3.5" />
+              Join
+            </button>
           )}
           {showInstallButton && (
             <button

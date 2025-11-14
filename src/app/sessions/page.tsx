@@ -7,7 +7,7 @@ import { PageIntro } from "@/components/shared/page-intro";
 import { formatDate } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 
-const sessionModules = [
+const staticSessionModules = [
   {
     id: "html-foundations",
     title: "HTML Foundations",
@@ -198,26 +198,34 @@ const SessionsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {sessionModules.map((mod) => (
-              <tr
-                key={mod.id}
-                className="border-t border-white/10 [&:nth-child(even)]:bg-white/3"
-              >
-                <td className="px-4 py-4 align-top text-white/60">
-                  {formatDate(mod.date, { month: "short", day: "numeric" })}
-                  <br />
-                  <span className="text-xs">{mod.weekday}</span>
-                </td>
-                <td className="px-4 py-4 align-top font-semibold">{mod.title}</td>
-                <td className="px-4 py-4">
-                  <ul className="list-disc pl-5 text-white/70">
-                    {mod.topics.map((topic) => (
-                      <li key={topic}>{topic}</li>
-                    ))}
-                  </ul>
-                </td>
-              </tr>
-            ))}
+            {(sessions.length > 0 ? sessions : staticSessionModules).map((item) => {
+              const topics = Array.isArray(item.topics) && item.topics.length > 0
+                ? item.topics
+                : item.description
+                  ? [item.description]
+                  : ["Live workshop"];
+              const weekdayLabel = item.weekday || formatDate(item.date, { weekday: "long" });
+              return (
+                <tr
+                  key={item.id || `${item.title}-${item.date}`}
+                  className="border-t border-white/10 [&:nth-child(even)]:bg-white/3"
+                >
+                  <td className="px-4 py-4 align-top text-white/60">
+                    {formatDate(item.date, { month: "short", day: "numeric" })}
+                    <br />
+                    <span className="text-xs">{weekdayLabel}</span>
+                  </td>
+                  <td className="px-4 py-4 align-top font-semibold">{item.title}</td>
+                  <td className="px-4 py-4">
+                    <ul className="list-disc pl-5 text-white/70">
+                      {topics.map((topic) => (
+                        <li key={topic}>{topic}</li>
+                      ))}
+                    </ul>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
