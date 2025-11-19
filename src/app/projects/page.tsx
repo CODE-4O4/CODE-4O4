@@ -4,7 +4,13 @@ import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
 import { Plus, Settings } from "lucide-react";
 import { getFirebaseApp, hasFirebaseConfig } from "@/lib/firebase/client";
-import { getFirestore, collection, onSnapshot, query } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  query,
+  type QueryDocumentSnapshot,
+} from "firebase/firestore";
 import { PageContainer } from "@/components/shared/page-container";
 import { PageIntro } from "@/components/shared/page-intro";
 import { useAuth } from "@/context/auth-context";
@@ -64,13 +70,25 @@ const ProjectsPage = () => {
         if (app) {
           const db = getFirestore(app);
           const q = query(collection(db, "projects"));
-          const unsubscribe = onSnapshot(q, (snapshot) => {
-            const live = snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as any) }));
-            setProjects(live as ShowcaseProject[]);
-            setLoading(false);
-          }, (err) => {
-            console.warn("Realtime projects listener error:", err);
-          });
+          const unsubscribe = onSnapshot(
+            q,
+            (snapshot) => {
+              const live = snapshot.docs.map(
+                (doc: QueryDocumentSnapshot) => {
+                  const data = doc.data() as ShowcaseProject;
+                  return {
+                    ...data,
+                    id: data?.id ?? doc.id,
+                  };
+                },
+              );
+              setProjects(live);
+              setLoading(false);
+            },
+            (err) => {
+              console.warn("Realtime projects listener error:", err);
+            },
+          );
 
           return () => unsubscribe();
         }
@@ -159,18 +177,26 @@ const ProjectsPage = () => {
                 </span>
               </div>
               <p className="mt-3 text-sm text-white/70">{project.description}</p>
-              {project.tech && (
-                <div className="mt-4 flex flex-wrap gap-2 text-xs text-white/70">
-                  {(Array.isArray(project.tech) ? project.tech : [project.tech]).map((tech: string, idx: number) => (
-                    <span
-                      key={`${tech}-${idx}`}
-                      className="rounded-full border border-white/15 px-3 py-1"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              )}
+              {(() => {
+                const techList = Array.isArray(project.tech)
+                  ? project.tech
+                  : project.tech
+                    ? [project.tech]
+                    : [];
+                if (!techList.length) return null;
+                return (
+                  <div className="mt-4 flex flex-wrap gap-2 text-xs text-white/70">
+                    {techList.map((tech) => (
+                      <span
+                        key={tech}
+                        className="rounded-full border border-white/15 px-3 py-1"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
               <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-white/60">
                 <span>Owner: {project.owner}</span>
                 <span className="text-xs uppercase tracking-[0.3em] text-white/40">
@@ -204,10 +230,10 @@ const ProjectsPage = () => {
                   </Button>
                 )}
                 <Link
-                  href="/dashboard"
+                  href={`/projects/${project.id}`}
                   className="rounded-full border border-white/20 px-5 py-2 text-sm text-white/80 transition hover:border-emerald-300/50"
                 >
-                  View dashboard
+                  View details
                 </Link>
               </div>
             </article>

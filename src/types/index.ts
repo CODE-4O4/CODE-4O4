@@ -1,6 +1,14 @@
 export type ExperienceLevel = "beginner" | "intermediate" | "advanced";
 export type MemberRole = "student" | "mentor" | "alumni";
 
+export type FirestoreDateValue =
+  | Date
+  | string
+  | number
+  | { seconds: number; nanoseconds: number }
+  | { _seconds: number; _nanoseconds: number }
+  | { toDate: () => Date };
+
 export type JoinRequestPayload = {
   displayName: string;
   email: string;
@@ -39,8 +47,8 @@ export type ClubUser = {
   experience?: ExperienceLevel;
   availability?: string;
   projectsCompleted?: number;
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: FirestoreDateValue;
+  updatedAt?: FirestoreDateValue;
 };
 
 export type FeatureCard = {
@@ -56,14 +64,17 @@ export type ShowcaseProject = {
   description: string;
   status: "active" | "recruiting" | "waitlist" | "completed";
   members: number;
-  tech: string[];
+  tech: string[] | string;
   owner: string;
   ownerId?: string; // User ID of the project owner for permission checks
+  summary?: string;
   githubUrl?: string;
   demoUrl?: string;
   docsUrl?: string;
-  createdAt?: any;
-  updatedAt?: any;
+  chatUrl?: string;
+  latestUpdate?: string;
+  createdAt?: FirestoreDateValue;
+  updatedAt?: FirestoreDateValue;
 };
 
 export type ClubEvent = {

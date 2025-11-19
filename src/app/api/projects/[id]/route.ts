@@ -4,6 +4,39 @@ import { getDb } from "@/lib/firebase/admin";
 // Force Node.js runtime for firebase-admin
 export const runtime = "nodejs";
 
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const db = getDb();
+    const doc = await db.collection("projects").doc(id).get();
+
+    if (!doc.exists) {
+      return NextResponse.json(
+        { ok: false, message: "Project not found" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      data: { id: doc.id, ...(doc.data() as Record<string, unknown>) },
+    });
+  } catch (error) {
+    console.error("❌ Failed to fetch project:", error);
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Failed to load project",
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 },
+    );
+  }
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -31,16 +64,19 @@ export async function PATCH(
 
     // Prepare update data with proper field filtering
     const allowedFields = [
-      'title',
-      'description',
-      'status',
-      'tech',
-      'githubUrl',
-      'demoUrl',
-      'docsUrl',
-    ];
+      "title",
+      "description",
+      "status",
+      "tech",
+      "githubUrl",
+      "demoUrl",
+      "docsUrl",
+    ] as const;
+    type AllowedField = (typeof allowedFields)[number];
 
-    const updateData: any = {
+    const updateData: Partial<Record<AllowedField, unknown>> & {
+      updatedAt: Date;
+    } = {
       updatedAt: new Date(),
     };
 

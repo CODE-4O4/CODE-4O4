@@ -1,18 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import SwRegister from '@/components/sw-register';
+import SwRegister from "@/components/sw-register";
 import { AuthProvider } from "@/context/auth-context";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "CODE 4O4 · Build, Learn, Grow",
@@ -87,9 +76,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#06b6d4" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <AuthProvider>
           {/* Register Service Worker early to avoid stale SW/cache causing unresponsive UI */}
           {/* Client component does nothing visible; it just registers the SW on mount */}

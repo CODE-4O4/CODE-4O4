@@ -12,6 +12,9 @@
   --border-glow: rgba(0, 229, 175, 0.45);
   --shadow-glow: 0 0 30px rgba(0, 204, 255, 0.25);
   --radius-xl: 32px;
+  --font-geist-sans: "Inter", "SF Pro Display", "Segoe UI", system-ui,
+    -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-geist-mono: "JetBrains Mono", "SFMono-Regular", "Menlo", monospace;
 }
 
 @theme inline {
