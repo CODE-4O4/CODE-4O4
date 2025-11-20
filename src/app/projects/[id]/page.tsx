@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import {
   ArrowLeft,
   BookOpen,
@@ -15,6 +16,7 @@ import { PageContainer } from "@/components/shared/page-container";
 import { PageIntro } from "@/components/shared/page-intro";
 import { getDb } from "@/lib/firebase/admin";
 import type {
+  ClubUser,
   FirestoreDateValue,
   ProjectInterestRequest,
   ShowcaseProject,
@@ -82,6 +84,30 @@ const statusMeta: Record<
     pill: "bg-white/15 text-white/80",
     accent: "border-white/20 text-white/80 bg-white/5",
   },
+};
+
+const getSessionUser = (): ClubUser | null => {
+  try {
+    const cookieStore = cookies();
+    const sessionCookie = cookieStore.get("code404-user");
+    if (!sessionCookie?.value) return null;
+
+    const decoded = decodeURIComponent(sessionCookie.value);
+    return JSON.parse(decoded) as ClubUser;
+  } catch (error) {
+    console.warn("⚠️ Unable to parse session user:", error);
+    return null;
+  }
+};
+
+const canManageProject = (project: ProjectRecord, user: ClubUser | null) => {
+  if (!user) return false;
+  const ownerName = project.owner?.toLowerCase();
+
+  return (
+    project.ownerId === user.id ||
+    (ownerName ? ownerName.startsWith(user.name.toLowerCase()) : false)
+  );
 };
 
 const toDate = (value?: FirestoreDateValue): Date | null => {
@@ -310,6 +336,8 @@ export default async function ProjectDetailPage({ params }: Params) {
   }
 
   const { project, members, pendingRequests, activities } = detail;
+  const sessionUser = getSessionUser();
+  const allowManage = canManageProject(project, sessionUser);
 
   const stack = ensureArray(project.tech);
   const activeMembers = members.filter((member) => (member.role ?? "member") !== "removed");
@@ -490,12 +518,14 @@ export default async function ProjectDetailPage({ params }: Params) {
               </div>
             </div>
             <div className="mt-6 space-y-3">
-              <Link
-                href={`/dashboard/projects/${project.id}/manage`}
-                className="inline-flex w-full items-center justify-center rounded-full border border-white/15 px-5 py-2 text-sm text-white/80 transition hover:border-emerald-300/60"
-              >
-                Manage project
-              </Link>
+              {allowManage && (
+                <Link
+                  href={`/dashboard/projects/${project.id}/manage`}
+                  className="inline-flex w-full items-center justify-center rounded-full border border-white/15 px-5 py-2 text-sm text-white/80 transition hover:border-emerald-300/60"
+                >
+                  Manage project
+                </Link>
+              )}
               {project.chatUrl ? (
                 <a
                   href={project.chatUrl}
@@ -521,19 +551,21 @@ export default async function ProjectDetailPage({ params }: Params) {
 
           <ProjectLinks project={project} />
 
-          <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
-            <p className="text-xs uppercase tracking-[0.35em] text-white/50">
-              Join requests
-            </p>
-            <p className="mt-3 text-3xl font-semibold text-white">{pendingCount}</p>
-            <p className="text-sm text-white/60">waiting for review</p>
-            <Link
-              href={`/dashboard/projects/${project.id}/manage`}
-              className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-white/15 px-5 py-2 text-sm text-white/80 transition hover:border-emerald-300/60"
-            >
-              Review requests
-            </Link>
-          </div>
+          {allowManage && (
+            <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
+              <p className="text-xs uppercase tracking-[0.35em] text-white/50">
+                Join requests
+              </p>
+              <p className="mt-3 text-3xl font-semibold text-white">{pendingCount}</p>
+              <p className="text-sm text-white/60">waiting for review</p>
+              <Link
+                href={`/dashboard/projects/${project.id}/manage`}
+                className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-white/15 px-5 py-2 text-sm text-white/80 transition hover:border-emerald-300/60"
+              >
+                Review requests
+              </Link>
+            </div>
+          )}
 
           <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-white/50">

@@ -586,6 +586,19 @@ const ManageProjectPage = () => {
                     className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-400/50"
                   />
                 </div>
+                <div>
+                  <label className="block text-xs text-white/60 mb-1">Squad chat URL</label>
+                  <input
+                    type="url"
+                    value={(editedProject as any)?.chatUrl || ""}
+                    onChange={(e) => setEditedProject({ ...editedProject, chatUrl: e.target.value })}
+                    placeholder="https://discord.gg/..."
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-400/50"
+                  />
+                  <p className="mt-1 text-[11px] text-white/40">
+                    Share your Discord, Slack, or WhatsApp invite link.
+                  </p>
+                </div>
                 <p className="text-xs text-white/50">
                   💡 Save changes to update project links
                 </p>
@@ -640,6 +653,23 @@ const ManageProjectPage = () => {
                   ) : (
                     <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/40">
                       <span>Documentation</span>
+                      <ExternalLink className="h-4 w-4 text-white/30" />
+                    </div>
+                  )}
+                  
+                  {(editedProject as any)?.chatUrl ? (
+                    <a
+                      href={(editedProject as any).chatUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm transition hover:bg-white/10"
+                    >
+                      <span>Squad Chat</span>
+                      <ExternalLink className="h-4 w-4 text-white/50" />
+                    </a>
+                  ) : (
+                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/40">
+                      <span>Squad Chat</span>
                       <ExternalLink className="h-4 w-4 text-white/30" />
                     </div>
                   )}
