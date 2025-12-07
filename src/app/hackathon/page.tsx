@@ -13,7 +13,9 @@ export default function HackathonPage() {
 
             {/* Footer */}
             <footer className="py-8 text-center text-neutral-600 border-t border-white/5 text-sm">
-                <p>© 2025 Code404 Hackathon. Built with DevForge.</p>
+                <p className="text-neutral-500 text-sm">
+                    © 2025 DevForge. Built by Dev Club NSTxSVYASA.
+                </p>
             </footer>
         </div>
     );

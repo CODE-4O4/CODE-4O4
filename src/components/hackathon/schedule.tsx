@@ -7,7 +7,7 @@ const scheduleItems = [
         day: "Day 1",
         date: "Saturday, December 20",
         events: [
-            { time: "07:00 AM", title: "Check-In", description: "Grab your ID and swag." },
+            { time: "07:00 AM", title: "Check-In", description: "Get your team no." },
             { time: "08:00 AM", title: "Opening Ceremony", description: "Event kickoff and rules." },
             { time: "09:00 AM", title: "Coding Begins", description: "Start your engines." },
             { time: "01:00 PM", title: "Lunch Break", description: "Refuel and network." },

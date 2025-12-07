@@ -62,6 +62,17 @@ export default function RegisterPage() {
         name: "members",
     });
 
+    // Check Firebase connection on mount
+    const [firebaseError, setFirebaseError] = useState<string | null>(null);
+    useState(() => {
+        // Simple check: do we have config?
+        // Note: We can't import hasFirebaseConfig easily because it's in a non-component file, 
+        // but we can check the env var availability which drives it.
+        if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+            setFirebaseError("Missing Firebase Environment Variables (NEXT_PUBLIC_FIREBASE_API_KEY)");
+        }
+    });
+
     // Watch type to adjust validation or UI if needed
     // const type = watch("type");
 
@@ -97,6 +108,13 @@ export default function RegisterPage() {
                 console.log("Document written to Firestore");
             } else {
                 console.warn("Firestore not initialized, skipping save");
+                // Log the real issue
+                if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+                    alert("Registration Failed: Firebase Config Missing. Please contact support.");
+                } else {
+                    alert("Registration Failed: Could not connect to database.");
+                }
+                return; // Stop here so we don't show success
             }
 
             // Simulate delay for better UX
@@ -140,6 +158,11 @@ export default function RegisterPage() {
         return (
             <div className="min-h-screen bg-black text-white p-4 md:p-8 flex items-center justify-center">
                 <div className="max-w-4xl w-full">
+                    {firebaseError && (
+                        <div className="mb-4 p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-200">
+                            <strong>System Error:</strong> {firebaseError}
+                        </div>
+                    )}
                     <Link href="/" className="inline-flex items-center text-neutral-400 hover:text-white mb-8 transition-colors">
                         <ArrowLeft className="w-4 h-4 mr-2" /> Back
                     </Link>

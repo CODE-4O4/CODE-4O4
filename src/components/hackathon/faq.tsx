@@ -23,7 +23,7 @@ const faqs = [
     },
     {
         question: "Will there be prizes?",
-        answer: "Yes! We have over $5,000 in prizes across different categories, plus special sponsor prizes.",
+        answer: "Yes! We have several swags and API credits in store for prizes.",
     },
 ];
 
