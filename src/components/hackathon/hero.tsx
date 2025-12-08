@@ -51,20 +51,6 @@ export function Hero() {
                     </div>
                 </motion.div>
 
-                <motion.div
-                    className="fixed top-0 left-0 right-0 z-50 py-3 bg-black/90 backdrop-blur-md border-b border-orange-500/20 flex justify-center"
-                    initial={{ opacity: 0, y: -50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-orange-500/30 bg-orange-950/30 text-orange-400 text-sm font-medium backdrop-blur-sm">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
-                        </span>
-                        Saturday, December 20, 2025
-                    </span>
-                </motion.div>
 
 
                 {/* 50 Spots Limited Banner */}

@@ -31,7 +31,7 @@ export function Schedule() {
                 <div className="space-y-12">
                     {scheduleItems.map((day, dayIndex) => (
                         <div key={dayIndex} className="relative">
-                            <div className="sticky top-24 z-10 bg-black/80 backdrop-blur-md py-2 mb-8 border-b border-white/10">
+                            <div className="py-2 mb-8 border-b border-white/10">
                                 <p className="text-xl md:text-2xl font-bold text-neutral-200">{day.date}</p>
                             </div>
 
