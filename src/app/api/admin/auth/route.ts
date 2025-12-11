@@ -12,8 +12,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check against environment variable
-        const adminPassword = process.env.ADMIN_PASSWORD || "devforge2025!";
+        // Check against environment variable - MUST be set in .env.local
+        const adminPassword = process.env.ADMIN_PASSWORD;
+
+        if (!adminPassword) {
+            console.error("ADMIN_PASSWORD environment variable is not set");
+            return NextResponse.json(
+                { success: false, error: "Server configuration error" },
+                { status: 500 }
+            );
+        }
 
         if (password === adminPassword) {
             // In production, generate JWT token here
