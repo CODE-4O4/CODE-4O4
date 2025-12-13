@@ -53,7 +53,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self';  script-src 'self' 'nonce-...' https://www.gstatic.com https://www.googletagmanager.com; connect-src 'self' https://*.firebaseio.com https://*.firebaseapp.com; img-src 'self' https://*.gstatic.com; style-src 'self' 'unsafe-inline';"
+            value: "default-src 'self' https://*.vercel.app;script-src 'self' https://*.vercel.app https://*.firebaseio.com https://*.firebaseapp.com https://*.googleapis.com https://www.gstatic.com;style-src 'self' https://*.vercel.app https://fonts.googleapis.com 'unsafe-inline';font-src 'self' https://*.vercel.app https://fonts.gstatic.com data:;connect-src 'self' https://*.vercel.app https://*.firebaseio.com https://*.firebaseapp.com https://*.googleapis.com https://www.gstatic.com wss://*.firebaseio.com;img-src 'self' https://*.vercel.app https://*.gstatic.com https://*.firebaseapp.com data: blob:;frame-src 'self' https://*.vercel.app https://*.firebaseapp.com;"
           }
         ],
       },
@@ -64,7 +64,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/hackathon/admin',
-        destination: '/admin',
+        destination: '/hackathon/admin',
         permanent: false,
       },
     ];

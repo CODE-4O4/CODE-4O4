@@ -29,11 +29,11 @@ const baseNavItems = [
 
 type NavbarProps = {
   showGuestCtas?: boolean;
-  onLogin?: () => void;
-  onJoin?: () => void;
+  onLoginAction?: () => void;
+  onJoinAction?: () => void;
 };
 
-export default function Navbar({ showGuestCtas = false, onLogin, onJoin }: NavbarProps = {}) {
+export default function Navbar({ showGuestCtas = false, onLoginAction, onJoinAction }: NavbarProps = {}) {
   const pathname = usePathname();
   const { user, logout, isAuthenticated } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -124,8 +124,8 @@ export default function Navbar({ showGuestCtas = false, onLogin, onJoin }: Navba
   };
 
   const handleLoginClick = () => {
-    if (onLogin) {
-      onLogin();
+    if (onLoginAction) {
+      onLoginAction();
       setIsMobileMenuOpen(false);
     } else {
       window.location.href = "/";
@@ -133,8 +133,8 @@ export default function Navbar({ showGuestCtas = false, onLogin, onJoin }: Navba
   };
 
   const handleJoinClick = () => {
-    if (onJoin) {
-      onJoin();
+    if (onJoinAction) {
+      onJoinAction();
       setIsMobileMenuOpen(false);
     } else {
       window.location.href = "/";

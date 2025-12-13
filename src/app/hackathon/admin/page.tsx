@@ -85,33 +85,24 @@ export default function AdminPage() {
         }
     };
 
+    // Auto-fetch when access is granted and role authorized
+    useEffect(() => {
+        if (isAuthorizedRole && accessGranted) {
+            fetchData();
+        }
+    }, [isAuthorizedRole, accessGranted]);
+
     const fetchData = async () => {
         setLoading(true);
         setConfigError(null);
         try {
-            if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
-                throw new Error("Missing Environment Variables (NEXT_PUBLIC_FIREBASE_API_KEY). Check your Vercel Project Settings.");
+            // Fetch via admin API to avoid client Firestore permissions issues
+            const res = await fetch('/api/admin/hackathon-registrations');
+            const json = await res.json();
+            if (!json.success) {
+                throw new Error(json.error || 'Failed to load registrations');
             }
-            const db = getFirestoreDb();
-            if (!db) {
-                throw new Error("Firestore not initialized. Possible config error.");
-            }
-            // Note: OrderBy might require an index, using simple fetch for now if it fails
-            const q = query(collection(db, "hackathon_registrations"), orderBy("createdAt", "desc"));
-
-            // Fallback if index missing: just getDocs(collection(...)) and sort client side
-            let snapshot;
-            try {
-                snapshot = await getDocs(q);
-            } catch (e) {
-                console.warn("Index query failed, fetching unsorted", e);
-                snapshot = await getDocs(collection(db, "hackathon_registrations"));
-            }
-
-            const data = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Registration[];
+            const data = json.registrations as Registration[];
 
             // Client sort if needed
             data.sort((a, b) => {
