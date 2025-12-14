@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { getFirestoreDb } from "@/lib/firebase/client";
-import { collection, getDocs, addDoc, query, orderBy, Timestamp } from "firebase/firestore";
-import { Loader2, Upload, Download, Search, RefreshCw, Users, User, ShieldCheck, XCircle, Mail, Heart } from "lucide-react";
+import { collection, addDoc } from "firebase/firestore";
+import { Loader2, Upload, Download, Search, RefreshCw, User, ShieldCheck, XCircle, Mail, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 
 // Removed hardcoded password - now using secure API authentication
@@ -24,6 +24,7 @@ type Registration = {
     type: "individual" | "team";
     teamName?: string;
     members: Member[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     createdAt: any;
 };
 
@@ -246,7 +247,7 @@ export default function AdminPage() {
 
                         <p className="text-base">
                             Special shoutout to the person who left that creative message in our registrations -
-                            <span className="text-orange-400 italic"> "Yooo admin I have access to the admin page"</span> -
+                            <span className="text-orange-400 italic"> &quot;Yooo admin I have access to the admin page&quot;</span> -
                             we see you and we appreciate the heads up! 🙌
                         </p>
 
@@ -255,7 +256,7 @@ export default function AdminPage() {
                                 💡 Know the admin password?
                             </p>
                             <p className="text-sm text-neutral-400 mb-4">
-                                If you have legitimate access or would like to collaborate with us, we'd love to hear from you!
+                                If you have legitimate access or would like to collaborate with us, we&apos;d love to hear from you!
                             </p>
                             <a
                                 href="mailto:support@code404.xyz"
@@ -267,8 +268,8 @@ export default function AdminPage() {
                         </div>
 
                         <p className="text-sm text-neutral-500">
-                            We're always looking to collaborate with talented developers and security enthusiasts.
-                            Let's build something amazing together! 🚀
+                            We&apos;re always looking to collaborate with talented developers and security enthusiasts.
+                            Let&apos;s build something amazing together! 🚀
                         </p>
                     </div>
 

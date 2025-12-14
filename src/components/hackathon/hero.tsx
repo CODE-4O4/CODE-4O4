@@ -7,10 +7,10 @@ import { ArrowRight, Code2, Terminal, Cpu } from "lucide-react";
 export function Hero() {
     return (
         <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden bg-black px-4">
-            {/* Background/Grid */}
+            {}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#f973161a_1px,transparent_1px),linear-gradient(to_bottom,#f973161a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
-            {/* Floating Elements (Background) */}
+            {}
             <motion.div
                 animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
@@ -27,7 +27,7 @@ export function Hero() {
             </motion.div>
 
             <div className="relative z-10 max-w-5xl mx-auto text-center space-y-8">
-                {/* Presented By Logos */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -53,7 +53,7 @@ export function Hero() {
 
 
 
-                {/* 20 Slots Limited Banner */}
+                {}
                 <motion.div
                     className="max-w-2xl mx-auto mt-6 mb-8"
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -112,7 +112,7 @@ export function Hero() {
                 </motion.div>
             </div>
 
-            {/* Bottom Fade */}
+            {}
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
         </section>
     );

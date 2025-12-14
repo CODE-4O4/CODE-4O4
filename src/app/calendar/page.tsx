@@ -45,7 +45,7 @@ const CalendarPage = () => {
     />
 
     <div className="mt-10 space-y-4">
-      {/* Club Calendar Schedule */}
+      {}
       <div className="mt-10 overflow-x-auto">
         <table className="min-w-full text-sm text-left text-white/80 border border-white/10 rounded-2xl bg-black/30">
           <thead>

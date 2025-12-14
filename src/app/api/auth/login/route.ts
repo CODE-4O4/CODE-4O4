@@ -4,7 +4,7 @@ import { comparePassword } from "@/lib/auth-utils";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
-  // Apply rate limiting
+  
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.AUTH);
   if (rateLimitResponse) {
     return rateLimitResponse;
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     const db = getDb();
 
-    // Search for member by username (case-insensitive)
+    
     const normalizedUsername = username.trim().toLowerCase();
 
     const membersSnapshot = await db
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const memberDoc = membersSnapshot.docs[0];
     const memberData = memberDoc.data();
 
-    // Check password using secure bcrypt comparison
+    
     const isPasswordValid = await comparePassword(password, memberData.password || '');
 
     if (!isPasswordValid) {
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Return user profile (without password)
+    
     const userProfile = {
       id: memberDoc.id,
       name: memberData.name,

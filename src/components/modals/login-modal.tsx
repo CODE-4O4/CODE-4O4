@@ -33,12 +33,12 @@ export const LoginModal = ({ open, onClose }: ModalProps) => {
     if (result.ok) {
       setFormState({ username: "", password: "" });
       onClose();
-      // Show a small transient success toast
+      
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2400);
 
-      // If the login returned the profile, redirect to the dynamic dashboard route.
-      // Use `replace` to avoid polluting history with the login step.
+      
+      
       const userId = result.user?.id ?? null;
       if (userId) {
         router.replace(`/dashboard/${userId}`);
@@ -49,7 +49,7 @@ export const LoginModal = ({ open, onClose }: ModalProps) => {
   };
 
   useEffect(() => {
-    // Autofocus username input when the modal opens and the user is not signed in.
+    
     if (open && !user) {
       usernameRef.current?.focus();
     }
@@ -184,7 +184,7 @@ export const LoginModal = ({ open, onClose }: ModalProps) => {
                     {message}
                   </p>
                 )}
-                {/* Small top-right toast for success to improve UX */}
+                {}
                 {showToast && status === "success" && (
                   <div className="fixed right-6 top-6 z-50 rounded-full bg-emerald-900/80 px-4 py-2 text-sm text-orange-300">
                     {message}

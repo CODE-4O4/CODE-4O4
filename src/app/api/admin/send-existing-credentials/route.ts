@@ -3,12 +3,12 @@ import { getDb } from "@/lib/firebase/admin";
 import { sendCredentialsEmail } from "@/lib/email";
 import { verifyAdminAuth } from "@/lib/auth-utils";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin authentication
+    
     const auth = await verifyAdminAuth(request);
     if (!auth.isAdmin) {
       return NextResponse.json(
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }> = [];
 
     if (sendToAll) {
-      // Get all members
+      
       console.log("📧 Fetching all members...");
       const membersSnapshot = await db.collection("members").get();
       membersToEmail = membersSnapshot.docs.map(doc => ({
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         ...doc.data(),
       }));
     } else if (memberIds.length > 0) {
-      // Get specific members
+      
       console.log(`📧 Fetching ${memberIds.length} specific members...`);
       for (const memberId of memberIds) {
         const memberDoc = await db.collection("members").doc(memberId).get();
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     };
 
     for (const member of membersToEmail) {
-      // Skip if no email
+      
       if (!member.email) {
         console.warn(`⚠️  Skipping ${member.name} - no email address`);
         results.skipped++;
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      // Skip if no credentials
+      
       if (!member.username || !member.password) {
         console.warn(`⚠️  Skipping ${member.name} - no credentials found`);
         results.skipped++;
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
           });
         }
 
-        // Add delay to avoid rate limiting
+        
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (error) {
         console.error(`❌ Error sending to ${member.email}:`, error);

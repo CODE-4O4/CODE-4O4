@@ -40,7 +40,7 @@ const ProjectsPage = () => {
   );
   const canRequest = useMemo(() => Boolean(user), [user]);
 
-  // Fetch projects from Firebase
+  
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -63,7 +63,7 @@ const ProjectsPage = () => {
 
     fetchProjects();
 
-    // If Firebase is configured, set up a real-time listener to auto-update projects (members count)
+    
     if (hasFirebaseConfig) {
       try {
         const app = getFirebaseApp();
@@ -160,7 +160,7 @@ const ProjectsPage = () => {
         ) : (
           projects.map((project) => {
           const status = projectState[project.id];
-          // Check ownership by user ID (more reliable than name matching)
+          
           const isOwner = user && (project.ownerId === user.id || (project.owner && project.owner.startsWith(user.name)));
           return (
             <article

@@ -26,7 +26,7 @@ export type ActionResult = {
   ok: boolean;
   message: string;
   error?: string;
-  // Optional user/profile returned by auth-related actions
+  
   user?: ClubUser;
 };
 
@@ -66,7 +66,7 @@ export type ShowcaseProject = {
   members: number;
   tech: string[] | string;
   owner: string;
-  ownerId?: string; // User ID of the project owner for permission checks
+  ownerId?: string; 
   summary?: string;
   githubUrl?: string;
   demoUrl?: string;

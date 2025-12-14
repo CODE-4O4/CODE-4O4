@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/firebase/admin";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function GET(
@@ -50,7 +50,7 @@ export async function PATCH(
     const db = getDb();
     const projectRef = db.collection("projects").doc(projectId);
 
-    // Check if project exists
+    
     const projectDoc = await projectRef.get();
     if (!projectDoc.exists) {
       return NextResponse.json(
@@ -62,7 +62,7 @@ export async function PATCH(
       );
     }
 
-    // Prepare update data with proper field filtering
+    
     const allowedFields = [
       "title",
       "description",
@@ -82,14 +82,14 @@ export async function PATCH(
       updatedAt: new Date(),
     };
 
-    // Only include allowed fields that are present in updates
+    
     allowedFields.forEach(field => {
       if (updates[field] !== undefined) {
         updateData[field] = updates[field];
       }
     });
 
-    // Update the project
+    
     await projectRef.update(updateData);
 
     console.log("✅ Project updated successfully:", projectId);

@@ -1,5 +1,5 @@
-// Simple avatar upload without Firebase Storage
-// Converts image to base64 and stores directly in Firestore
+
+
 export const uploadAvatar = async (file: File, userId: string): Promise<string> => {
   try {
     console.log("🔧 Converting image to base64...");
@@ -30,10 +30,10 @@ export const uploadAvatar = async (file: File, userId: string): Promise<string> 
   }
 };
 
-// Note: deleteAvatar is not needed with base64 approach
-// Old avatar is simply overwritten when new one is uploaded
+
+
 export const deleteAvatar = async (userId: string, fileExtension: string): Promise<void> => {
-  // No-op for base64 approach
+  
   console.log("ℹ️ Delete not needed for base64 avatars");
 };
 

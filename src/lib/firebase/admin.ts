@@ -6,7 +6,7 @@ import type { ServiceAccount } from "firebase-admin";
 let adminApp: App | null = null;
 
 const getServiceAccount = (): ServiceAccount | null => {
-  // Debug: Log available environment variables (without sensitive data)
+  
   console.log("🔍 Environment check:", {
     hasServiceAccount: !!process.env.FIREBASE_SERVICE_ACCOUNT,
     hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
@@ -17,23 +17,23 @@ const getServiceAccount = (): ServiceAccount | null => {
     vercel: process.env.VERCEL,
   });
 
-  // PRIORITY 1: Try FIREBASE_SERVICE_ACCOUNT JSON first (most reliable for complete config)
+  
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
       console.log("📝 Attempting to parse FIREBASE_SERVICE_ACCOUNT...");
       const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
       const parsed = JSON.parse(serviceAccountJson);
       
-      // Extract and properly format the private key
+      
       let privateKey = parsed.private_key;
       
-      // CRITICAL: Handle all possible newline encodings
-      // 1. Replace literal \n strings with actual newlines
+      
+      
       if (typeof privateKey === 'string') {
         privateKey = privateKey.replace(/\\n/g, '\n');
       }
       
-      // 2. Ensure proper PEM format
+      
       if (!privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
         console.error("❌ Private key missing PEM header");
         throw new Error("Invalid private key format");
@@ -49,11 +49,11 @@ const getServiceAccount = (): ServiceAccount | null => {
       } as ServiceAccount;
     } catch (error) {
       console.error("❌ Failed to parse FIREBASE_SERVICE_ACCOUNT:", error);
-      // Continue to fallback method
+      
     }
   }
 
-  // PRIORITY 2: Fallback to individual environment variables
+  
   const projectId = process.env.FIREBASE_PROJECT_ID?.trim();
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
   let privateKey = process.env.FIREBASE_PRIVATE_KEY;
@@ -61,17 +61,17 @@ const getServiceAccount = (): ServiceAccount | null => {
   if (projectId && clientEmail && privateKey) {
     console.log("✅ Using individual Firebase environment variables");
 
-    // CRITICAL: Handle all possible private key formats
-    // 1. Replace literal \n with actual newlines
+    
+    
     privateKey = privateKey.replace(/\\n/g, '\n');
     
-    // 2. Remove any extra quotes that might have been added
+    
     privateKey = privateKey.replace(/^["']|["']$/g, '');
     
-    // 3. Trim whitespace
+    
     privateKey = privateKey.trim();
 
-    // Verify the private key format
+    
     if (!privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
       console.error("❌ Private key doesn't have proper PEM header");
       console.error("First 50 chars:", privateKey.substring(0, 50));

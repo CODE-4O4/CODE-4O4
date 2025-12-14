@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb, serverTimestamp } from "@/lib/firebase/admin";
 import type { JoinRequestPayload } from "@/types";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     
     const db = getDb();
     
-    // Add to pendingMembers collection
+    
     await db.collection("pendingMembers").add({
       name: payload.displayName,
       email: payload.email,

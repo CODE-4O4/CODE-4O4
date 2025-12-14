@@ -9,11 +9,11 @@ export default function SwRegister() {
       if (typeof window === "undefined") return;
       try {
         const webpush = await import("@/lib/webpush");
-        // registerServiceWorker will handle waiting worker and controllerchange
+        
         await webpush.registerServiceWorker();
       } catch (e) {
-        // ignore; registration is best-effort
-        // eslint-disable-next-line no-console
+        
+        
         console.warn('SW register failed (sw-register component)', e);
       }
     })();

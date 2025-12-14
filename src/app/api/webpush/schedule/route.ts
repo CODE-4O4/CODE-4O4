@@ -4,7 +4,7 @@ import { getDb } from '../../../../lib/firebase/admin';
 function isAdminOrSecret(req: Request) {
   const secret = req.headers.get('x-webpush-secret') || '';
   const cookieHeader = req.headers.get('cookie');
-  // Check cookie for admin role
+  
   if (cookieHeader) {
     try {
       const cookies = cookieHeader.split(';').map(c => c.trim());
@@ -17,18 +17,15 @@ function isAdminOrSecret(req: Request) {
         }
       }
     } catch (e) {
-      // ignore parse errors
+      
     }
   }
-  // Check secret header
+  
   if (process.env.WEBPUSH_SEND_SECRET && secret === process.env.WEBPUSH_SEND_SECRET) return true;
   return false;
 }
 
-/**
- * POST: Create a scheduled notification
- * body: { sendAt: string ISO timestamp, payload: object, audience?: 'all' | 'subscribed' | { ... } }
- */
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -61,7 +58,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  // Protected: admin or secret required
+  
   if (!isAdminOrSecret(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

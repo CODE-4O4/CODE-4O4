@@ -96,7 +96,7 @@ export default function MemberProfileModal({ userId, onClose }: MemberProfileMod
         className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-white/10 bg-gray-900 p-8"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {}
         <div className="mb-6 flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-4">
@@ -128,9 +128,9 @@ export default function MemberProfileModal({ userId, onClose }: MemberProfileMod
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Main Content */}
+          {}
           <div className="space-y-6 lg:col-span-2">
-            {/* Contact Information */}
+            {}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <h3 className="mb-4 text-lg font-semibold">Contact Information</h3>
               <div className="space-y-3">
@@ -173,7 +173,7 @@ export default function MemberProfileModal({ userId, onClose }: MemberProfileMod
               </div>
             </div>
 
-            {/* Bio */}
+            {}
             {profile.bio && (
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
                 <h3 className="mb-3 text-lg font-semibold">About</h3>
@@ -181,7 +181,7 @@ export default function MemberProfileModal({ userId, onClose }: MemberProfileMod
               </div>
             )}
 
-            {/* Experience */}
+            {}
             {profile.experience && (
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
                 <h3 className="mb-3 text-lg font-semibold">Experience</h3>
@@ -189,7 +189,7 @@ export default function MemberProfileModal({ userId, onClose }: MemberProfileMod
               </div>
             )}
 
-            {/* Skills */}
+            {}
             {profile.skills && profile.skills.length > 0 && (
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
                 <h3 className="mb-3 text-lg font-semibold">Skills</h3>
@@ -206,7 +206,7 @@ export default function MemberProfileModal({ userId, onClose }: MemberProfileMod
               </div>
             )}
 
-            {/* Interests */}
+            {}
             {profile.interests && profile.interests.length > 0 && (
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
                 <h3 className="mb-3 text-lg font-semibold">Interests</h3>
@@ -224,7 +224,7 @@ export default function MemberProfileModal({ userId, onClose }: MemberProfileMod
             )}
           </div>
 
-          {/* Sidebar - Stats */}
+          {}
           <div className="space-y-4">
             <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-orange-600/10 to-orange-500/10 p-6">
               <div className="mb-2 flex items-center gap-2">

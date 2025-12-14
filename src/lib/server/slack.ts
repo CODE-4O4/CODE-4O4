@@ -3,6 +3,7 @@ const SLACK_API_URL = "https://slack.com/api/chat.postMessage";
 export type SlackMessagePayload = {
   text: string;
   channel?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   blocks?: any[];
   thread_ts?: string;
   unfurl_links?: boolean;
@@ -32,12 +33,13 @@ async function sendViaWebhook(payload: SlackMessagePayload): Promise<SlackPostRe
   const webhook = process.env.SLACK_WEBHOOK_URL;
   if (!webhook) throw new Error("SLACK_WEBHOOK_URL is not configured");
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const body: Record<string, any> = {
     text: payload.text,
     blocks: payload.blocks,
   };
 
-  // Incoming webhooks can optionally override channel if allowed in the app config.
+  
   if (payload.channel) {
     body.channel = payload.channel;
   }
@@ -101,7 +103,7 @@ async function deliverSlackMessage(payload: SlackMessagePayload): Promise<SlackP
     try {
       return await sendViaWebhook(payload);
     } catch (err) {
-      // If webhook fails and a bot token exists, attempt fallback.
+      
       if (process.env.SLACK_BOT_TOKEN && process.env.SLACK_DEVCLUB_CHANNEL_ID) {
         return await sendViaBotToken(payload);
       }

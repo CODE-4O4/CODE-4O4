@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/firebase/admin";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function DELETE(
@@ -16,7 +16,7 @@ export async function DELETE(
 
     const db = getDb();
     
-    // Delete the member from projectMembers collection
+    
     await db.collection("projectMembers").doc(memberId).delete();
 
     console.log("✅ Member removed successfully:", memberId);

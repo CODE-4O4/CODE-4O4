@@ -6,7 +6,7 @@ import {
 } from "./firestore";
 import type { JoinRequestPayload, ActionResult } from "@/types";
 
-// Mock the global fetch
+
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 

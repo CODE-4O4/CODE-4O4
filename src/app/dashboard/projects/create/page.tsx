@@ -126,7 +126,7 @@ const CreateProjectPage = () => {
 
       <form onSubmit={handleSubmit} className="mt-10 max-w-3xl">
         <div className="space-y-6 rounded-3xl border border-white/10 bg-black/40 p-8">
-          {/* Project Title */}
+          {}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-white/80">
               Project Title <span className="text-red-400">*</span>
@@ -146,7 +146,7 @@ const CreateProjectPage = () => {
             </p>
           </div>
 
-          {/* Project Description */}
+          {}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-white/80">
               Description <span className="text-red-400">*</span>
@@ -166,7 +166,7 @@ const CreateProjectPage = () => {
             </p>
           </div>
 
-          {/* Tech Stack */}
+          {}
           <div>
             <label className="block text-sm font-medium text-white/80">
               Tech Stack <span className="text-red-400">*</span>
@@ -201,7 +201,7 @@ const CreateProjectPage = () => {
             )}
           </div>
 
-          {/* Project Status */}
+          {}
           <div>
             <label htmlFor="status" className="block text-sm font-medium text-white/80">
               Project Status
@@ -220,7 +220,7 @@ const CreateProjectPage = () => {
             </select>
           </div>
 
-          {/* Project Owner Info */}
+          {}
           <div className="rounded-xl border border-white/10 bg-white/5 p-4">
             <p className="text-sm text-white/60">
               <strong className="text-white/80">Project Owner:</strong> {user.name}
@@ -235,7 +235,7 @@ const CreateProjectPage = () => {
             </p>
           </div>
 
-          {/* Action Buttons */}
+          {}
           <div className="flex gap-4">
             <button
               type="submit"

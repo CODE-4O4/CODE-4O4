@@ -3,21 +3,37 @@ import { getDb, serverTimestamp } from "@/lib/firebase/admin";
 
 export const runtime = "nodejs";
 
-// GET - Fetch all members
-export async function GET() {
+
+
+export async function GET(request: Request) {
   try {
     console.log("🔄 Fetching members from Firestore...");
     const db = getDb();
+    
+    
+    const cookieHeader = request.headers.get("cookie");
+    let isAdmin = false;
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(';').map(c => c.trim());
+      const userCookie = cookies.find(c => c.startsWith('code404-user='));
+      if (userCookie) {
+        try {
+          const user = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
+          isAdmin = user && user.role === 'admin';
+        } catch {  }
+      }
+    }
 
     const membersSnapshot = await db.collection("members").get();
 
-    // Explicitly select safe fields - NEVER expose password field
+    
     const members = membersSnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
         name: data.name,
-        email: data.email,
+        
+        email: isAdmin ? data.email : undefined, 
         role: data.role,
         avatar: data.avatar,
         points: data.points || 0,
@@ -25,7 +41,7 @@ export async function GET() {
         github: data.github,
         portfolio: data.portfolio,
         joinedAt: data.joinedAt,
-        // Explicitly NOT including: password, username, credentialsUpdated
+        
       };
     });
 
@@ -44,7 +60,7 @@ export async function GET() {
   }
 }
 
-// POST - Create/Update member
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {
@@ -83,12 +99,12 @@ export async function POST(request: Request) {
 
       let docRef;
       if (id) {
-        // Update existing member
+        
         await db.collection("members").doc(id).update(memberData);
         console.log("✅ Updated member:", id);
         docRef = { id };
       } else {
-        // Create new member
+        
         docRef = await db.collection("members").add({
           ...memberData,
           createdAt: serverTimestamp(),

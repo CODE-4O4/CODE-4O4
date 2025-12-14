@@ -19,7 +19,7 @@ export default function AdminWebpushPage() {
     setSending(true);
     try {
       const headers: any = { 'Content-Type': 'application/json' };
-      // If user is not an admin (shouldn't happen on this page), require secret
+      
       if (!user || user.role !== 'admin') {
         const secret = prompt('Enter WEBPUSH_SEND_SECRET to send:');
         if (!secret) {
@@ -45,7 +45,7 @@ export default function AdminWebpushPage() {
     }
   };
 
-  // Scheduling feature removed — only immediate send is supported now.
+  
 
   return (
     <div className="p-6 max-w-2xl">

@@ -30,7 +30,7 @@ const formSchema = z.object({
     return true;
 }, {
     message: "Team name and at least 2 members are required for team registration",
-    path: ["teamName"], // pinpoint error
+    path: ["teamName"], 
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -38,8 +38,8 @@ type FormData = z.infer<typeof formSchema>;
 export default function RegisterPage() {
     const [submitted, setSubmitted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-    // "individual" | "team" | null - controlled by UI state before react-hook-form takes over fully? 
-    // Actually, let's keep the split flow UI but integrate it into the form state or just set default values.
+    
+    
     const [registrationType, setRegistrationType] = useState<"individual" | "team" | null>(null);
 
     const {
@@ -62,32 +62,32 @@ export default function RegisterPage() {
         name: "members",
     });
 
-    // Check Firebase connection on mount
+    
     const [firebaseError, setFirebaseError] = useState<string | null>(null);
     useEffect(() => {
-        // Simple check: do we have config?
-        // Note: We can't import hasFirebaseConfig easily because it's in a non-component file, 
-        // but we can check the env var availability which drives it.
+        
+        
+        
         if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
             setFirebaseError("Missing Firebase Environment Variables (NEXT_PUBLIC_FIREBASE_API_KEY)");
         }
     }, []);
 
-    // Watch type to adjust validation or UI if needed
-    // const type = watch("type");
+    
+    
 
     const handleTypeSelect = (type: "individual" | "team") => {
         setRegistrationType(type);
         setValue("type", type);
         if (type === "team") {
-            // Ensure at least 2 slots for team?
+            
             if (fields.length < 2) {
                 append({ name: "", email: "", phone: "", gender: "male", github: "", portfolio: "" });
             }
         } else {
-            // Reset to 1 for individual
+            
             if (fields.length > 1) {
-                // remove extra fields? simplistic approach:
+                
                 setValue("members", [fields[0]]);
             }
         }
@@ -108,16 +108,16 @@ export default function RegisterPage() {
                 console.log("Document written to Firestore");
             } else {
                 console.warn("Firestore not initialized, skipping save");
-                // Log the real issue
+                
                 if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
                     alert("Registration Failed: Firebase Config Missing. Please contact support.");
                 } else {
                     alert("Registration Failed: Could not connect to database.");
                 }
-                return; // Stop here so we don't show success
+                return; 
             }
 
-            // Send confirmation email (non-blocking - don't fail registration if email fails)
+            
             try {
                 const leadMember = data.members[0];
                 const emailResponse = await fetch("/api/hackathon/send-confirmation", {
@@ -142,10 +142,10 @@ export default function RegisterPage() {
                 }
             } catch (emailError) {
                 console.error("⚠️ Error sending confirmation email (non-blocking):", emailError);
-                // Continue with registration success even if email fails
+                
             }
 
-            // Simulate delay for better UX
+            
             await new Promise((resolve) => setTimeout(resolve, 1000));
             setSubmitted(true);
         } catch (error) {
@@ -264,7 +264,7 @@ export default function RegisterPage() {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-                    {/* Team Name - Only for Teams */}
+                    {}
                     {registrationType === "team" && (
                         <div className="space-y-2 p-6 bg-neutral-900/50 border border-neutral-800 rounded-xl">
                             <label className="text-sm font-medium text-neutral-300">Team Name</label>
@@ -277,7 +277,7 @@ export default function RegisterPage() {
                         </div>
                     )}
 
-                    {/* Member Fields */}
+                    {}
                     <div className="space-y-6">
                         {fields.map((field, index) => (
                             <motion.div

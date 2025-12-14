@@ -2,24 +2,25 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+// import { registerServiceWorker } from "@/lib/webpush";
+
+import Image from "next/image";
 import { PageContainer } from "@/components/shared/page-container";
 import { PageIntro } from "@/components/shared/page-intro";
 import { useAuth } from "@/context/auth-context";
 import { 
-  User, 
-  Mail, 
-  Phone, 
-  Github, 
-  Globe, 
-  Award, 
-  TrendingUp,
   Settings,
   Camera,
   Save,
   X,
-  Upload
+  User,
+  Globe,
+  Github,
+  Award,
+  TrendingUp
 } from "lucide-react";
 import { uploadAvatar } from "@/lib/firebase/storage";
+
 
 type UserProfile = {
   id: string;
@@ -38,7 +39,11 @@ type UserProfile = {
   badges?: number;
   projectsCompleted?: number;
   avatar?: string;
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createdAt?: any;
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updatedAt?: any;
 };
 
@@ -53,7 +58,7 @@ export default function ProfilePage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Redirect to home if not authenticated
+  
   useEffect(() => {
     if (!isAuthenticated) {
       console.log("🔒 Not authenticated, redirecting to home");
@@ -78,7 +83,7 @@ export default function ProfilePage() {
           setProfile(result.data);
           setEditedProfile(result.data);
         } else {
-          // Create default profile if none exists
+          
           const defaultProfile: UserProfile = {
             id: user.id,
             name: user.name || "",
@@ -122,7 +127,7 @@ export default function ProfilePage() {
         setProfile(editedProfile);
         setIsEditing(false);
         
-        // Update auth context with new profile data
+        
         updateUser({
           name: editedProfile.name,
           email: editedProfile.email,
@@ -160,27 +165,27 @@ export default function ProfilePage() {
       return;
     }
 
-    // Validate file type
+    
     const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
     if (!validTypes.includes(file.type)) {
       alert("❌ Please upload a valid image file (JPEG, PNG, GIF, or WebP)");
-      event.target.value = ""; // Reset input
+      event.target.value = ""; 
       return;
     }
 
-    // Validate file size (max 2MB for base64 storage)
-    // Base64 encoding increases size by ~33%, so 2MB file becomes ~2.6MB base64
-    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    
+    
+    const maxSize = 2 * 1024 * 1024; 
     if (file.size > maxSize) {
       alert("❌ Image size must be less than 2MB (base64 storage limitation)");
-      event.target.value = ""; // Reset input
+      event.target.value = ""; 
       return;
     }
 
     setUploadingAvatar(true);
     console.log("🚀 Starting avatar upload process...");
     
-    // Set a timeout to prevent infinite loading
+    
     const uploadTimeout = setTimeout(() => {
       console.error("⏱️ Upload timeout after 30 seconds");
       setUploadingAvatar(false);
@@ -199,7 +204,7 @@ export default function ProfilePage() {
       
       console.log("✅ Avatar uploaded successfully:", avatarUrl);
       
-      // Update both editedProfile and profile immediately
+      
       const updatedProfile = {
         ...editedProfile!,
         avatar: avatarUrl,
@@ -209,7 +214,7 @@ export default function ProfilePage() {
       setProfile(updatedProfile);
 
       console.log("💾 Saving avatar URL to database...");
-      // Save to database
+      
       const response = await fetch(`/api/profile`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -223,7 +228,7 @@ export default function ProfilePage() {
       console.log("💾 Database save result:", result);
       
       if (result.ok) {
-        // Update auth context with new avatar
+        
         updateUser({ avatar: avatarUrl });
         console.log("✅ Auth context updated with new avatar");
         alert("✅ Avatar updated successfully!");
@@ -236,7 +241,7 @@ export default function ProfilePage() {
       console.error("❌ Error uploading avatar:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       
-      // More specific error messages
+      
       let userMessage = `❌ Failed to upload avatar: ${errorMessage}`;
       
       if (errorMessage.includes("Failed to read")) {
@@ -248,7 +253,7 @@ export default function ProfilePage() {
       alert(userMessage);
     } finally {
       setUploadingAvatar(false);
-      // Reset the file input so the same file can be selected again
+      
       if (event.target) {
         event.target.value = "";
       }
@@ -308,16 +313,18 @@ export default function ProfilePage() {
       />
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_350px]">
-        {/* Main Content */}
+        {}
         <div className="space-y-6">
-          {/* Profile Header */}
+          {}
           <section className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <div className="flex items-start gap-6">
               <div className="relative">
                 {editedProfile?.avatar ? (
-                  <img
+                  <Image
                     src={editedProfile.avatar}
                     alt={editedProfile.name}
+                    width={96}
+                    height={96}
                     className="h-24 w-24 rounded-full object-cover"
                   />
                 ) : (
@@ -392,7 +399,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          {/* Personal Information */}
+          {}
           <section className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <div className="mb-4 flex items-center gap-3">
               <User className="h-5 w-5 text-orange-500" />
@@ -474,7 +481,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          {/* Links */}
+          {}
           <section className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <div className="mb-4 flex items-center gap-3">
               <Globe className="h-5 w-5 text-orange-500" />
@@ -518,7 +525,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          {/* Skills */}
+          {}
           <section className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <div className="mb-4 flex items-center gap-3">
               <Award className="h-5 w-5 text-purple-400" />
@@ -562,9 +569,9 @@ export default function ProfilePage() {
           </section>
         </div>
 
-        {/* Sidebar */}
+        {}
         <aside className="space-y-6">
-          {/* Stats */}
+          {}
           <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <h3 className="mb-4 text-sm uppercase tracking-[0.3em] text-orange-300">
               Your Stats
@@ -596,7 +603,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Quick Actions */}
+          {}
           <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <h3 className="mb-4 text-sm uppercase tracking-[0.3em] text-orange-300">
               Quick Actions
@@ -623,7 +630,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Account */}
+          {}
           <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <h3 className="mb-4 text-sm uppercase tracking-[0.3em] text-orange-300">
               Account

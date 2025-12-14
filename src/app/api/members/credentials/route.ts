@@ -3,7 +3,7 @@ import { getDb } from "@/lib/firebase/admin";
 import { sendCredentialsEmail } from "@/lib/email";
 import { hashPassword, generateSecurePassword } from "@/lib/auth-utils";
 
-// Update member credentials
+
 export async function PATCH(request: Request) {
   try {
     const { memberId, username, password, sendEmail = true } = await request.json();
@@ -28,23 +28,23 @@ export async function PATCH(request: Request) {
 
     const memberData = memberDoc.data();
 
-    // Generate username from name if not provided
+    
     let finalUsername = username;
     if (!finalUsername && memberData?.name) {
-      // Convert "Sahitya Singh" -> "sahitya"
+      
       finalUsername = memberData.name.split(" ")[0].toLowerCase().replace(/[^a-z0-9]/g, "");
     }
 
-    // Generate secure random password if not provided
+    
     let finalPassword = password;
     if (!finalPassword) {
       finalPassword = generateSecurePassword(12);
     }
 
-    // Hash the password before storing
+    
     const hashedPassword = await hashPassword(finalPassword);
 
-    // Update the member document with hashed password
+    
     await memberRef.update({
       username: finalUsername,
       password: hashedPassword,
@@ -53,7 +53,7 @@ export async function PATCH(request: Request) {
 
     console.log(`✅ Updated credentials for ${memberData?.name} (username: ${finalUsername})`);
 
-    // Send email with credentials if requested
+    
     let emailSent = false;
     if (sendEmail && memberData?.email) {
       try {
@@ -75,9 +75,9 @@ export async function PATCH(request: Request) {
       message: emailSent
         ? "Credentials updated and email sent successfully"
         : "Credentials updated successfully",
+      // Password removed from response for security - sent via email only
       credentials: {
         username: finalUsername,
-        password: finalPassword,
       },
       emailSent,
     });

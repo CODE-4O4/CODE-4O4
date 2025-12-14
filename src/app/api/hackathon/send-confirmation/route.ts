@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendHackathonRegistrationEmail } from "@/lib/email";
 import validator from "validator";
 
-// Simple in-memory rate limiting (IP-based)
+
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 3; // Max 3 requests
-const RATE_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
+const RATE_LIMIT = 3; 
+const RATE_WINDOW = 60 * 60 * 1000; 
 
 function checkRateLimit(ip: string): boolean {
     const now = Date.now();
@@ -26,7 +26,7 @@ function checkRateLimit(ip: string): boolean {
 
 export async function POST(request: NextRequest) {
     try {
-        // Rate limiting check
+        
         const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
         if (!checkRateLimit(ip)) {
             console.warn(`⚠️ [API] Rate limit exceeded for IP: ${ip}`);
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         let { email, name, type, teamName, memberCount } = body;
 
-        // Validate required fields
+        
         if (!email || !name || !type || !memberCount) {
             return NextResponse.json(
                 { success: false, error: "Missing required fields" },
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Sanitize and validate email
+        
         email = validator.normalizeEmail(email) || email;
         if (!validator.isEmail(email)) {
             return NextResponse.json(
@@ -56,13 +56,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Sanitize text inputs to prevent XSS
+        
         name = validator.escape(name);
         if (teamName) {
             teamName = validator.escape(teamName);
         }
 
-        // Validate type
+        
         if (type !== "individual" && type !== "team") {
             return NextResponse.json(
                 { success: false, error: "Invalid registration type" },
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // For team registrations, teamName is required
+        
         if (type === "team" && !teamName) {
             return NextResponse.json(
                 { success: false, error: "Team name is required for team registrations" },

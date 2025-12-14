@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb, serverTimestamp } from "@/lib/firebase/admin";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
@@ -74,17 +74,29 @@ export async function POST(request: Request) {
   }
 }
 
-// GET route to fetch all projects
+
 export async function GET() {
   try {
     console.log("🔄 Fetching projects from Firestore...");
     const db = getDb();
     
     const projectsSnapshot = await db.collection("projects").get();
-    const projects = projectsSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const projects = projectsSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        title: data.title,
+        description: data.description,
+        tech: data.tech,
+        status: data.status,
+        owner: data.owner,
+        ownerId: data.ownerId,
+        members: data.members,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        
+      };
+    });
     
     console.log(`✅ Fetched ${projects.length} projects`);
     return NextResponse.json({ 

@@ -62,7 +62,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="DevForge" />
-        {/* Make manifest & icons explicit to help installability checks */}
+        {}
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" type="image/png" href="/icon.png" />
         <link rel="apple-touch-icon" href="/icon.png" />
@@ -71,15 +71,15 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <AuthProvider>
-          {/* Register Service Worker early to avoid stale SW/cache causing unresponsive UI */}
-          {/* Client component does nothing visible; it just registers the SW on mount */}
-          {/* eslint-disable-next-line @next/next/no-async-client-component */}
-          {/* @ts-ignore */}
+          {}
+          {}
+          {}
+          {}
           <script suppressHydrationWarning={true} />
-          {/* Import client component */}
-          {/* The component is a small client-only mount to register the SW */}
+          {}
+          {}
           {
-            // Render the SW register component as a client boundary
+            
           }
           <SwRegister />
           {children}

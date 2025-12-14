@@ -26,7 +26,7 @@ const SessionsPage = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  // Check if user is admin or mentor
+  
   const canManageSessions = user?.role === "admin" || user?.role === "mentor";
 
   const fetchSessions = useCallback(

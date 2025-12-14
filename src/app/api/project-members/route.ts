@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/firebase/admin";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     
     console.log("🔄 Fetching members for project:", projectId);
     
-    // Get all members for this project
+    
     const membersSnapshot = await db
       .collection("projectMembers")
       .where("projectId", "==", projectId)
@@ -34,10 +34,18 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const members = membersSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const members = membersSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        projectId: data.projectId,
+        userId: data.userId,
+        userName: data.userName,
+        // userEmail removed from public response for privacy
+        role: data.role,
+        joinedAt: data.joinedAt,
+      };
+    });
 
     console.log(`✅ Found ${members.length} members for project:`, projectId);
 

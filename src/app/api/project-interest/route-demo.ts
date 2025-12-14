@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
@@ -20,8 +20,8 @@ export async function POST(request: Request) {
       );
     }
     
-    // For demo purposes, we'll just log the request and return success
-    // In production, you would save to Firestore here
+    
+    
     console.log(" Successfully received project interest for:", projectId, "from user:", userId);
     console.log("📝 Note: Using demo mode - data not persisted to Firestore");
     

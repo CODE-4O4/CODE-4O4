@@ -75,7 +75,7 @@ const EventsPage = () => {
                     : "border-white/10 bg-white/5 hover:border-orange-400/40 hover:bg-white/[0.07]"
                   }`}
               >
-                {/* Animated gradient overlay for hackathons */}
+                {}
                 {isHackathon && (
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0"
@@ -91,7 +91,7 @@ const EventsPage = () => {
                 )}
 
                 <div className="relative p-6">
-                  {/* Event Type Badge */}
+                  {}
                   <div className="flex flex-wrap items-center gap-3 mb-3">
                     <motion.span
                       whileHover={{ scale: 1.05 }}
@@ -105,7 +105,7 @@ const EventsPage = () => {
                     </motion.span>
                   </div>
 
-                  {/* Event Title */}
+                  {}
                   <h2 className={`text-2xl md:text-3xl font-bold mb-3 transition-colors ${isHackathon
                       ? "text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-300 to-red-400 group-hover:from-orange-300 group-hover:to-red-300"
                       : "text-white group-hover:text-orange-400"
@@ -113,12 +113,12 @@ const EventsPage = () => {
                     {event.title}
                   </h2>
 
-                  {/* Event Summary */}
+                  {}
                   <p className="text-sm md:text-base text-white/70 mb-4 leading-relaxed">
                     {event.summary}
                   </p>
 
-                  {/* Event Details */}
+                  {}
                   <div className="flex flex-wrap gap-4 mb-4 text-sm text-white/60">
                     <div className="flex items-center gap-2">
                       <Calendar className={`w-4 h-4 ${isHackathon ? "text-orange-400" : "text-orange-500"}`} />
@@ -139,7 +139,7 @@ const EventsPage = () => {
                     </div>
                   </div>
 
-                  {/* CTA Button */}
+                  {}
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Link
                       href={isHackathon && event.registrationUrl ? event.registrationUrl : "/dashboard"}
@@ -162,10 +162,10 @@ const EventsPage = () => {
                   </motion.div>
                 </div>
 
-                {/* Hackathon special effects */}
+                {}
                 {isHackathon && (
                   <>
-                    {/* Corner accent */}
+                    {}
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-500/20 to-transparent blur-2xl" />
                     <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-red-500/20 to-transparent blur-2xl" />
                   </>

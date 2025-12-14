@@ -44,7 +44,7 @@ const ManageProjectPage = () => {
   const [editedProject, setEditedProject] = useState<any>(null);
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
-  // Fetch the project details
+  
   useEffect(() => {
     const fetchProject = async () => {
       try {
@@ -57,7 +57,7 @@ const ManageProjectPage = () => {
           if (foundProject) {
             console.log("✅ Found project:", foundProject);
             setProject(foundProject);
-            setEditedProject(foundProject); // Initialize edited project
+            setEditedProject(foundProject); 
           } else {
             console.warn("⚠️  Project not found in data");
             setProject(null);
@@ -75,7 +75,7 @@ const ManageProjectPage = () => {
     }
   }, [projectId]);
 
-  // Fetch project interests from Firestore
+  
   const fetchInterests = async () => {
     try {
       console.log("🔄 Fetching interests for project:", projectId);
@@ -87,11 +87,11 @@ const ManageProjectPage = () => {
         setLocalRequests(result.data);
       } else {
         console.warn("⚠️  Failed to fetch interests:", result.message);
-        setLocalRequests([]); // Set empty array on error
+        setLocalRequests([]); 
       }
     } catch (error) {
       console.error("❌ Error fetching interests:", error);
-      setLocalRequests([]); // Set empty array on error
+      setLocalRequests([]); 
     } finally {
       setLoading(false);
     }
@@ -103,7 +103,7 @@ const ManageProjectPage = () => {
     }
   }, [projectId]);
 
-  // Fetch current project members
+  
   const fetchMembers = async () => {
     try {
       console.log("🔄 Fetching members for project:", projectId);
@@ -168,7 +168,7 @@ const ManageProjectPage = () => {
           status: "approved",
           projectId,
           userId,
-          deleteAfter: true // Delete the document after approval
+          deleteAfter: true 
         }),
       });
 
@@ -177,7 +177,7 @@ const ManageProjectPage = () => {
       if (data.ok) {
         console.log("✅ Approved and deleted request:", interestId);
         alert("✅ User approved to join the project!");
-        // Manually refresh lists after approval
+        
         await fetchInterests();
         await fetchMembers();
       }
@@ -195,7 +195,7 @@ const ManageProjectPage = () => {
         body: JSON.stringify({ 
           interestId, 
           status: "rejected",
-          deleteAfter: true // Delete the document after rejection
+          deleteAfter: true 
         }),
       });
 
@@ -204,7 +204,7 @@ const ManageProjectPage = () => {
       if (data.ok) {
         console.log("❌ Rejected and deleted request:", interestId);
         alert("❌ Request rejected");
-        // Manually refresh after rejection
+        
         await fetchInterests();
       }
     } catch (error) {
@@ -230,7 +230,7 @@ const ManageProjectPage = () => {
       if (data.ok) {
         console.log("✅ Member removed:", memberId);
         alert(`✅ ${memberName} has been removed from the project`);
-        // Manually refresh members list after removal
+        
         await fetchMembers();
       } else {
         alert("❌ Failed to remove member: " + data.message);
@@ -241,7 +241,7 @@ const ManageProjectPage = () => {
     }
   };
 
-  // Show loading state while fetching project
+  
   if (projectLoading) {
     return (
       <PageContainer>
@@ -269,7 +269,7 @@ const ManageProjectPage = () => {
     );
   }
 
-  // Check if user is the project owner
+  
   if (!user || !(project.ownerId === user.id || project.owner.startsWith(user.name))) {
     return (
       <PageContainer>
@@ -307,9 +307,9 @@ const ManageProjectPage = () => {
       />
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_400px]">
-        {/* Main Content */}
+        {}
         <div className="space-y-8">
-          {/* Project Info */}
+          {}
           <section className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -402,7 +402,7 @@ const ManageProjectPage = () => {
             </div>
           </section>
 
-          {/* Current Members */}
+          {}
           <section className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -463,7 +463,7 @@ const ManageProjectPage = () => {
             )}
           </section>
 
-          {/* Join Requests */}
+          {}
           <section className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <div className="mb-4 flex items-center gap-3">
               <Users className="h-5 w-5 text-orange-500" />
@@ -521,9 +521,9 @@ const ManageProjectPage = () => {
           </section>
         </div>
 
-        {/* Sidebar */}
+        {}
         <aside className="space-y-6">
-          {/* Quick Stats */}
+          {}
           <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <h3 className="mb-4 text-sm uppercase tracking-[0.3em] text-orange-300">
               Quick Stats
@@ -548,7 +548,7 @@ const ManageProjectPage = () => {
             </div>
           </div>
 
-          {/* Project Links */}
+          {}
           <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
             <h3 className="mb-4 text-sm uppercase tracking-[0.3em] text-orange-300">
               Project Links
@@ -683,7 +683,7 @@ const ManageProjectPage = () => {
         </aside>
       </div>
 
-      {/* Member Profile Modal */}
+      {}
       {selectedMemberId && (
         <MemberProfileModal
           userId={selectedMemberId}

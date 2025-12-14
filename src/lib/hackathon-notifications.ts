@@ -1,16 +1,11 @@
-/**
- * Hackathon Notification System
- * Centralized configuration and utilities for DevForge hackathon notifications
- */
+
 
 import { addHours, addMinutes, subHours, subMinutes } from 'date-fns';
 
-// Hackathon event date and time (IST)
-export const HACKATHON_DATE = new Date('2025-12-20T07:00:00+05:30'); // Dec 20, 2025, 7:00 AM IST
 
-/**
- * Notification templates for different hackathon milestones
- */
+export const HACKATHON_DATE = new Date('2025-12-20T07:00:00+05:30'); 
+
+
 export const NOTIFICATION_TEMPLATES = {
     REGISTRATION_CONFIRMATION: {
         title: "Welcome to DevForge! 🚀",
@@ -160,15 +155,12 @@ export const NOTIFICATION_TEMPLATES = {
     }
 };
 
-/**
- * Calculate notification schedule based on hackathon date
- * Returns array of { sendAt: Date, payload: object, meta: object }
- */
+
 export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DATE) {
     return [
-        // Day before reminder (Dec 19, 6:00 PM IST)
+        
         {
-            sendAt: subHours(hackathonDate, 13), // 13 hours before = 6 PM previous day
+            sendAt: subHours(hackathonDate, 13), 
             payload: NOTIFICATION_TEMPLATES.DAY_BEFORE_REMINDER,
             meta: {
                 type: 'day-before-reminder',
@@ -176,7 +168,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
             }
         },
 
-        // Check-in reminder (Dec 20, 6:30 AM IST)
+        
         {
             sendAt: subMinutes(hackathonDate, 30),
             payload: NOTIFICATION_TEMPLATES.CHECK_IN_REMINDER,
@@ -186,7 +178,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
             }
         },
 
-        // Opening ceremony (Dec 20, 7:45 AM IST)
+        
         {
             sendAt: addMinutes(hackathonDate, 45),
             payload: NOTIFICATION_TEMPLATES.OPENING_CEREMONY,
@@ -196,7 +188,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
             }
         },
 
-        // Coding begins (Dec 20, 8:55 AM IST)
+        
         {
             sendAt: addHours(addMinutes(hackathonDate, 55), 1),
             payload: NOTIFICATION_TEMPLATES.CODING_BEGINS,
@@ -206,7 +198,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
             }
         },
 
-        // Lunch break (Dec 20, 12:45 PM IST)
+        
         {
             sendAt: addHours(addMinutes(hackathonDate, 45), 5),
             payload: NOTIFICATION_TEMPLATES.LUNCH_BREAK,
@@ -216,7 +208,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
             }
         },
 
-        // Mid-evaluation (Dec 20, 1:45 PM IST)
+        
         {
             sendAt: addHours(addMinutes(hackathonDate, 45), 6),
             payload: NOTIFICATION_TEMPLATES.MID_EVALUATION,
@@ -226,7 +218,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
             }
         },
 
-        // Final submission warning (Dec 20, 5:00 PM IST)
+        
         {
             sendAt: addHours(hackathonDate, 10),
             payload: NOTIFICATION_TEMPLATES.FINAL_SUBMISSION_WARNING,
@@ -236,7 +228,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
             }
         },
 
-        // Final submission reminder (Dec 20, 5:45 PM IST)
+        
         {
             sendAt: addHours(addMinutes(hackathonDate, 45), 10),
             payload: NOTIFICATION_TEMPLATES.FINAL_SUBMISSION_REMINDER,
@@ -246,7 +238,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
             }
         },
 
-        // Demos & judging (Dec 20, 6:15 PM IST)
+        
         {
             sendAt: addHours(addMinutes(hackathonDate, 15), 11),
             payload: NOTIFICATION_TEMPLATES.DEMOS_JUDGING,
@@ -256,7 +248,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
             }
         },
 
-        // Closing ceremony (Dec 20, 6:50 PM IST)
+        
         {
             sendAt: addHours(addMinutes(hackathonDate, 50), 11),
             payload: NOTIFICATION_TEMPLATES.CLOSING_CEREMONY,
@@ -268,9 +260,7 @@ export function calculateNotificationSchedule(hackathonDate: Date = HACKATHON_DA
     ];
 }
 
-/**
- * Get registration confirmation notification payload
- */
+
 export function getRegistrationNotification(userName?: string) {
     const template = NOTIFICATION_TEMPLATES.REGISTRATION_CONFIRMATION;
     return {

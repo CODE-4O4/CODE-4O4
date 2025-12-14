@@ -25,7 +25,7 @@ type NotificationBellProps = {
 
 const STORAGE_KEY = "code404-local-notifications";
 const MAX_NOTIFICATIONS = 40;
-const SYNC_INTERVAL_MS = 5 * 60 * 1000; // fetch at most once every 5 minutes
+const SYNC_INTERVAL_MS = 5 * 60 * 1000; 
 
 const formatRelativeTime = (iso: string | null) => {
   if (!iso) return "";
@@ -58,7 +58,7 @@ const persistToStorage = (key: string, items: NotificationItem[]) => {
   try {
     window.localStorage.setItem(key, JSON.stringify(items));
   } catch {
-    // ignore quota errors
+    
   }
 };
 
@@ -263,7 +263,7 @@ export default function NotificationBell({
     persistNotifications(nextItems);
     const success = await patchServerReadState({ markAllAsRead: true });
     if (!success) {
-      // reload previous state from storage if server update fails
+      
       setNotifications(readFromStorage(storageKey));
     }
     setMarking(false);

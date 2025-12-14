@@ -3,9 +3,28 @@ import { getDb, serverTimestamp } from "@/lib/firebase/admin";
 
 export const runtime = "nodejs";
 
-// GET - Fetch project interests (optionally filtered)
+
 export async function GET(request: Request) {
   try {
+    const cookieHeader = request.headers.get("cookie");
+    let isAuthorized = false;
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(';').map(c => c.trim());
+      const userCookie = cookies.find(c => c.startsWith('code404-user='));
+      if (userCookie) {
+        try {
+          const user = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
+          isAuthorized = user && (user.role === 'admin' || user.role === 'mentor');
+        } catch {  }
+      }
+    }
+
+    if (!isAuthorized) {
+      return NextResponse.json(
+        { ok: false, message: "Unauthorized - Admin access required" },
+        { status: 401 }
+      );
+    }
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
     const status = searchParams.get("status");
@@ -16,9 +35,11 @@ export async function GET(request: Request) {
     let query = db.collection("projectInterests");
     
     if (projectId) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       query = query.where("projectId", "==", projectId) as any;
     }
     if (status) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       query = query.where("status", "==", status) as any;
     }
     
@@ -27,15 +48,15 @@ export async function GET(request: Request) {
       snapshot.docs.map(async (doc) => {
         const data = doc.data();
         
-        // Try to fetch project details, fallback to projectId
+        
         let projectName = data.projectId || "Unknown Project";
         try {
-          // First try by document ID
+          
           const projectDoc = await db.collection("projects").doc(data.projectId).get();
           if (projectDoc.exists) {
             projectName = projectDoc.data()?.title || projectName;
           } else {
-            // Try to find by matching ID field
+            
             const projectQuery = await db.collection("projects")
               .where("id", "==", data.projectId)
               .limit(1)
@@ -48,18 +69,18 @@ export async function GET(request: Request) {
           console.warn("⚠️  Could not fetch project details:", err);
         }
         
-        // Try to fetch user details, fallback to userId
+        
         let userName = data.userId || "Unknown User";
         let userEmail = "";
         try {
-          // First try by document ID
+          
           const userDoc = await db.collection("members").doc(data.userId).get();
           if (userDoc.exists) {
             const userData = userDoc.data();
             userName = userData?.name || userName;
             userEmail = userData?.email || "";
           } else {
-            // Try to find by matching ID field
+            
             const userQuery = await db.collection("members")
               .where("id", "==", data.userId)
               .limit(1)
@@ -99,7 +120,7 @@ export async function GET(request: Request) {
   }
 }
 
-// PATCH - Update project interest status (approve/reject)
+
 export async function PATCH(request: Request) {
   try {
     const body = (await request.json()) as {
@@ -107,13 +128,13 @@ export async function PATCH(request: Request) {
       status?: "approved" | "rejected" | "pending";
       projectId?: string;
       userId?: string;
-      deleteAfter?: boolean; // Option to delete after status update
-      ownerId?: string; // ID of the person approving (project owner)
+      deleteAfter?: boolean; 
+      ownerId?: string; 
     };
     
     console.log("📝 Updating project interest:", body);
     
-    const { interestId, status, deleteAfter = false } = body;
+    const { interestId, status } = body;
     
     if (!interestId || !status) {
       return NextResponse.json(
@@ -125,7 +146,7 @@ export async function PATCH(request: Request) {
     try {
       const db = getDb();
       
-      // Get the project interest data before deleting
+      
       const interestDoc = await db.collection("projectInterests").doc(interestId).get();
       
       if (!interestDoc.exists) {
@@ -139,9 +160,9 @@ export async function PATCH(request: Request) {
       const projectId = body.projectId || interestData?.projectId;
       const userId = body.userId || interestData?.userId;
       
-      // If approved, add to projectMembers collection
+      
       if (status === "approved" && projectId && userId) {
-        // Get user details from members collection
+        
         let userName = "Unknown User";
         let userEmail = "";
         
@@ -156,7 +177,7 @@ export async function PATCH(request: Request) {
           console.warn("⚠️  Could not fetch user details:", err);
         }
         
-        // Add to projectMembers collection
+        
         await db.collection("projectMembers").add({
           projectId,
           userId,
@@ -169,25 +190,25 @@ export async function PATCH(request: Request) {
         
         console.log(`✅ Added user ${userId} to projectMembers for project ${projectId}`);
         
-        // Award points for joining a project
+        
         try {
           const userRef = db.collection("members").doc(userId);
           const userDoc = await userRef.get();
           if (userDoc.exists) {
             const currentPoints = userDoc.data()?.points || 0;
             await userRef.update({
-              points: currentPoints + 10, // Award 10 points for joining
+              points: currentPoints + 10, 
               updatedAt: new Date(),
             });
             console.log(`🏆 Awarded 10 points to user ${userId} for joining project`);
           }
         } catch (pointsError) {
           console.warn("⚠️  Failed to award points:", pointsError);
-          // Don't fail the whole operation if points update fails
+          
         }
       }
       
-      // Record the decision in adminDecisions
+      
       await db.collection("adminDecisions").add({
         type: "project_interest",
         interestId,
@@ -201,7 +222,7 @@ export async function PATCH(request: Request) {
       
       console.log("✅ Recorded decision in adminDecisions");
       
-      // Always delete from projectInterests after processing
+      
       await db.collection("projectInterests").doc(interestId).delete();
       console.log(`🗑️  Deleted project interest ${interestId}`);
       
@@ -234,7 +255,7 @@ export async function PATCH(request: Request) {
   }
 }
 
-// DELETE - Delete a project interest
+
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

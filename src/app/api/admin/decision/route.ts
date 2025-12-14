@@ -2,12 +2,12 @@ import { NextResponse, NextRequest } from "next/server";
 import { getDb, serverTimestamp, getMessaging } from "@/lib/firebase/admin";
 import { verifyAdminAuth } from "@/lib/auth-utils";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin authentication
+    
     const auth = await verifyAdminAuth(request);
     if (!auth.isAdmin) {
       return NextResponse.json(
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     const db = getDb();
     
-    // Save decision
+    
     await db.collection("adminDecisions").add({
       requestId: id,
       decision,
@@ -38,14 +38,14 @@ export async function POST(request: NextRequest) {
       actedAt: serverTimestamp(),
     });
     
-    // Get the pending member request to send notification
+    
     const requestDoc = await db.collection("pendingMembers").doc(id).get();
     if (requestDoc.exists) {
       const requestData = requestDoc.data();
       
-      // If approved, check if member exists and send notification
+      
       if (decision === "approve" && requestData?.email) {
-        // Find the member by email
+        
         const membersSnapshot = await db
           .collection("members")
           .where("email", "==", requestData.email)
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
           const memberDoc = membersSnapshot.docs[0];
           const memberData = memberDoc.data();
           
-          // Send approval notification
+          
           if (memberData?.fcmTokens && memberData.fcmTokens.length > 0) {
             const messaging = getMessaging();
             const notificationTitle = "Welcome to DevForge! 🎉";
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
               }
             }
             
-            // Store notification
+            
             await db.collection("notifications").add({
               userId: memberDoc.id,
               title: notificationTitle,

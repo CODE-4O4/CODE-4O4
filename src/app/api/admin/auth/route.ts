@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateAdminToken } from "@/lib/auth-utils";
 
-// Simple authentication - now uses proper JWT tokens
+
 export async function POST(request: NextRequest) {
     try {
         const { password } = await request.json();
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check against environment variable - MUST be set in .env.local
+        
         const adminPassword = process.env.ADMIN_PASSWORD;
 
         if (!adminPassword) {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         }
 
         if (password === adminPassword) {
-            // Generate proper JWT token with expiration
+            
             const token = generateAdminToken({
                 role: 'admin',
                 timestamp: Date.now()

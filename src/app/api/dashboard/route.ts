@@ -17,7 +17,7 @@ export async function GET(request: Request) {
 
     const db = getDb();
 
-    // Get user data from members collection
+    
     const memberDoc = await db.collection("members").doc(userId).get();
 
     if (!memberDoc.exists) {
@@ -29,8 +29,8 @@ export async function GET(request: Request) {
 
     const memberData = memberDoc.data();
 
-    // Get user's projects - both as member and as owner
-    // 1. Get projects where user is a member
+    
+    
     const projectMembersQuery = await db
       .collection("projectMembers")
       .where("userId", "==", userId)
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
 
     const memberProjectIds = projectMembersQuery.docs.map(doc => doc.data().projectId);
 
-    // 2. Get projects where user is the owner
+    
     const ownedProjectsQuery = await db
       .collection("projects")
       .where("ownerId", "==", userId)
@@ -49,7 +49,7 @@ export async function GET(request: Request) {
       ...doc.data(),
     }));
 
-    // 3. Get member project details
+    
     let memberProjects: any[] = [];
     if (memberProjectIds.length > 0) {
       const projectsPromises = memberProjectIds.map(async (projectId) => {
@@ -63,7 +63,7 @@ export async function GET(request: Request) {
       memberProjects = projectsResults.filter(p => p !== null);
     }
 
-    // Combine owned and member projects, remove duplicates by id
+    
     const allProjectsMap = new Map();
     [...ownedProjects, ...memberProjects].forEach(project => {
       if (project && !allProjectsMap.has(project.id)) {
@@ -72,7 +72,7 @@ export async function GET(request: Request) {
     });
     const userProjects = Array.from(allProjectsMap.values());
 
-    // Compute member counts for each project to avoid stale "members" fields
+    
     const projectIds = userProjects.map((project) => project.id);
     const memberCounts = new Map<string, number>();
     await Promise.all(
@@ -94,9 +94,9 @@ export async function GET(request: Request) {
       memberCount: memberCounts.get(project.id) ?? project.members ?? 0,
     }));
 
-    // Get upcoming sessions (next 5)
+    
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const todayStr = now.toISOString().split('T')[0]; 
 
     const sessionsQuery = await db
       .collection("sessions")
@@ -110,13 +110,13 @@ export async function GET(request: Request) {
       ...doc.data(),
     }));
 
-    // Get upcoming events count for stats
+    
     const eventsQuery = await db
       .collection("events")
       .where("date", ">=", todayStr)
       .get();
 
-    // Calculate stats
+    
     const stats = {
       activeProjects: userProjects.length,
       upcomingEvents: eventsQuery.size,
@@ -138,7 +138,7 @@ export async function GET(request: Request) {
           badges: memberData?.badges || 0,
           github: memberData?.github,
           portfolio: memberData?.portfolio,
-          // Explicitly NOT including: password, username
+          
         },
         stats,
         projects: projectsWithCounts,

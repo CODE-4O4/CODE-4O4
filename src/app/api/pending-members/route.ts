@@ -5,26 +5,48 @@ import { hashPassword, generateSecurePassword } from "@/lib/auth-utils";
 
 export const runtime = "nodejs";
 
-// GET - Fetch all pending member requests
+
 export async function GET(request: Request) {
   try {
+    // Authentication check - only admins can view pending members
+    const cookieHeader = request.headers.get("cookie");
+    let isAdmin = false;
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(';').map(c => c.trim());
+      const userCookie = cookies.find(c => c.startsWith('code404-user='));
+      if (userCookie) {
+        try {
+          const user = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
+          isAdmin = user && (user.role === 'admin' || user.role === 'mentor');
+        } catch {  }
+      }
+    }
+
+    if (!isAdmin) {
+      return NextResponse.json(
+        { ok: false, message: "Unauthorized - Admin access required" },
+        { status: 401 }
+      );
+    }
+
     console.log("🔄 Fetching pending members...");
     const db = getDb();
 
-    // Fetch all pending members without orderBy to avoid index requirement
+    
     const snapshot = await db
       .collection("pendingMembers")
       .where("status", "==", "pending")
       .get();
 
-    // Sort in JavaScript instead
+    
     const pendingMembers = snapshot.docs
       .map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .sort((a: any, b: any) => {
-        // Sort by createdAt descending (newest first)
+        
         const aTime = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
         const bTime = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
         return bTime - aTime;
@@ -49,7 +71,7 @@ export async function GET(request: Request) {
   }
 }
 
-// PATCH - Approve or reject a pending member
+
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
@@ -66,7 +88,7 @@ export async function PATCH(request: Request) {
 
     const db = getDb();
 
-    // Get the pending member data
+    
     const pendingMemberDoc = await db
       .collection("pendingMembers")
       .doc(memberId)
@@ -86,21 +108,21 @@ export async function PATCH(request: Request) {
     let password = null;
 
     if (decision === "approved") {
-      // Create a unique user ID
+      
       userId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-      // Generate username and password
+      
       const firstName = (memberData?.name || "member").split(" ")[0].toLowerCase().replace(/[^a-z0-9]/g, "");
 
       username = firstName;
 
-      // Generate secure random password
+      
       password = generateSecurePassword(12);
 
-      // Hash the password before storing
+      
       const hashedPassword = await hashPassword(password);
 
-      // Add to members collection with hashed password
+      
       await db.collection("members").doc(userId).set({
         id: userId,
         name: memberData?.name || "Unknown",
@@ -125,7 +147,7 @@ export async function PATCH(request: Request) {
 
       console.log("✅ Added to members collection with ID:", userId, "(username:", username, ")");
 
-      // Send welcome email with credentials
+      
       if (memberData?.email) {
         try {
           console.log(`📧 Attempting to send welcome email to ${memberData.email}...`);
@@ -146,14 +168,14 @@ export async function PATCH(request: Request) {
         } catch (emailError) {
           console.error("❌ Error sending welcome email:", emailError);
           console.error("   Full error:", JSON.stringify(emailError, null, 2));
-          // Don't fail the approval if email fails
+          
         }
       } else {
         console.warn('⚠️  No email address found for member, skipping email send');
       }
     }
 
-    // Record admin decision
+    
     await db.collection("adminDecisions").add({
       type: "member_approval",
       memberId,
@@ -165,7 +187,7 @@ export async function PATCH(request: Request) {
 
     console.log("✅ Recorded admin decision");
 
-    // Delete from pendingMembers
+    
     await db.collection("pendingMembers").doc(memberId).delete();
 
     console.log("✅ Deleted from pendingMembers");
@@ -176,7 +198,7 @@ export async function PATCH(request: Request) {
         ? `Member approved! Welcome email sent to ${memberData?.email}`
         : `Member ${decision}!`,
       ...(userId && { userId }),
-      ...(username && password && { credentials: { username, password } }),
+      // Credentials removed from response for security - sent via email only
       ...(memberData?.name && { name: memberData.name }),
       ...(memberData?.email && { email: memberData.email }),
     });

@@ -5,10 +5,7 @@ import { serverTimestamp } from "@/lib/firebase/admin";
 
 const getTodayIsoDate = () => new Date().toISOString().split("T")[0];
 
-/**
- * Marks sessions older than today as archived so they disappear from the UI
- * without requiring manual intervention.
- */
+
 export async function archivePastSessions(db: Firestore) {
   const todayKey = getTodayIsoDate();
   const outdatedSnap = await db

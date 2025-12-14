@@ -1,6 +1,4 @@
-/* Client helper: src/lib/webpush.ts
-   Utilities to register the service worker, get VAPID public key, subscribe/unsubscribe
-*/
+
 export const isWebPushSupported = () => {
   return typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window;
 };
@@ -21,7 +19,7 @@ export async function registerServiceWorker() {
   try {
     const registration = await navigator.serviceWorker.register('/sw.js');
 
-    // If a waiting worker is already present (update available), request it to skipWaiting
+    
     if (registration.waiting) {
       try {
         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
@@ -30,15 +28,17 @@ export async function registerServiceWorker() {
       }
     }
 
-    // Listen for controller change to reload the page when the new SW takes control
+    
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      // Small guard to avoid infinite reload loop
+      
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((window as any).__webpush_sw_reloaded) return;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).__webpush_sw_reloaded = true;
       window.location.reload();
     });
 
-    // Also handle updatefound: when a new SW is installing, forward SKIP_WAITING once installed
+    
     if (registration.installing) {
       const sw = registration.installing;
       sw.addEventListener('statechange', () => {
@@ -82,7 +82,7 @@ export async function subscribeForPush(userId?: string): Promise<PushSubscriptio
       applicationServerKey: urlBase64ToUint8Array(publicKey),
     });
 
-    // send to server
+    
     await fetch('/api/webpush/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -102,7 +102,7 @@ export async function unsubscribeFromPush(): Promise<boolean> {
     const registration = await navigator.serviceWorker.ready;
     const sub = await registration.pushManager.getSubscription();
     if (!sub) return true;
-    // inform server
+    
     await fetch('/api/webpush/subscribe', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },

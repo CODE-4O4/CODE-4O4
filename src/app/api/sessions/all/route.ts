@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/firebase/admin";
 import { archivePastSessions } from "@/lib/server/sessions-maintenance";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
     console.log("🔄 Fetching all sessions from Firebase...");
 
-    // Verify user has admin or mentor role
+    
     const db = getDb();
     const userRef = db.collection("members").doc(userId!);
     const userDoc = await userRef.get();

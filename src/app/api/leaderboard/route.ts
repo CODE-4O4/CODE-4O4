@@ -1,15 +1,33 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/firebase/admin";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
-/**
- * Update member stats for leaderboard
- * This endpoint can be called to award points, badges, or update project counts
- */
+
 export async function POST(request: NextRequest) {
   try {
+    // Admin-only: prevent unauthorized point manipulation
+    const cookieHeader = request.headers.get("cookie");
+    let isAdmin = false;
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(';').map(c => c.trim());
+      const userCookie = cookies.find(c => c.startsWith('code404-user='));
+      if (userCookie) {
+        try {
+          const user = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
+          isAdmin = user && (user.role === 'admin' || user.role === 'mentor');
+        } catch {  }
+      }
+    }
+
+    if (!isAdmin) {
+      return NextResponse.json(
+        { ok: false, message: "Unauthorized - Admin access required" },
+        { status: 401 }
+      );
+    }
+
     const { userId, action, value } = await request.json();
 
     if (!userId || !action) {
@@ -24,7 +42,7 @@ export async function POST(request: NextRequest) {
     const db = getDb();
     const userRef = db.collection("members").doc(userId);
 
-    // Check if user exists
+    
     const userDoc = await userRef.get();
     if (!userDoc.exists) {
       return NextResponse.json({
@@ -34,11 +52,12 @@ export async function POST(request: NextRequest) {
     }
 
     const currentData = userDoc.data();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any = {
       updatedAt: new Date(),
     };
 
-    // Handle different actions
+    
     switch (action) {
       case "addPoints":
         updates.points = (currentData?.points || 0) + (value || 0);
@@ -52,17 +71,17 @@ export async function POST(request: NextRequest) {
 
       case "completeProject":
         updates.projectsCompleted = (currentData?.projectsCompleted || 0) + 1;
-        updates.points = (currentData?.points || 0) + 50; // Award 50 points for completing a project
+        updates.points = (currentData?.points || 0) + 50; 
         console.log(`✅ Project completed. New total: ${updates.projectsCompleted}`);
         break;
 
       case "joinProject":
-        updates.points = (currentData?.points || 0) + 10; // Award 10 points for joining a project
+        updates.points = (currentData?.points || 0) + 10; 
         console.log(`✅ Joined project. Points awarded: 10`);
         break;
 
       case "attendEvent":
-        updates.points = (currentData?.points || 0) + 25; // Award 25 points for attending an event
+        updates.points = (currentData?.points || 0) + 25; 
         console.log(`✅ Attended event. Points awarded: 25`);
         break;
 
@@ -83,7 +102,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 });
     }
 
-    // Update the user document
+    
     await userRef.update(updates);
 
     console.log(`✅ Stats updated successfully for user: ${userId}`);
@@ -106,9 +125,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-/**
- * Get leaderboard stats for all users or specific user
- */
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -118,7 +135,7 @@ export async function GET(request: NextRequest) {
     const db = getDb();
 
     if (userId) {
-      // Get stats for specific user
+      
       const userDoc = await db.collection("members").doc(userId).get();
       if (!userDoc.exists) {
         return NextResponse.json({
@@ -133,7 +150,7 @@ export async function GET(request: NextRequest) {
         data: {
           id: userDoc.id,
           name: userData?.name,
-          email: userData?.email,
+          // Email removed from public response for privacy
           role: userData?.role,
           avatar: userData?.avatar,
           points: userData?.points || 0,
@@ -141,12 +158,12 @@ export async function GET(request: NextRequest) {
           github: userData?.github,
           portfolio: userData?.portfolio,
           projectsCompleted: userData?.projectsCompleted || 0,
-          // Explicitly NOT including: password, username
+          
         },
       });
     }
 
-    // Get leaderboard (top users by points) - explicitly select safe fields
+    
     const usersSnapshot = await db
       .collection("members")
       .orderBy("points", "desc")
@@ -159,7 +176,7 @@ export async function GET(request: NextRequest) {
         rank: index + 1,
         id: doc.id,
         name: data.name,
-        email: data.email,
+        // Email removed from public response for privacy
         role: data.role,
         avatar: data.avatar,
         points: data.points || 0,
@@ -167,7 +184,7 @@ export async function GET(request: NextRequest) {
         github: data.github,
         portfolio: data.portfolio,
         projectsCompleted: data.projectsCompleted || 0,
-        // Explicitly NOT including: password, username
+        
       };
     });
 

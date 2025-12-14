@@ -16,7 +16,7 @@ function isAdminOrSecret(req: Request) {
         }
       }
     } catch (e) {
-      // ignore
+      
     }
   }
   if (process.env.WEBPUSH_SEND_SECRET && secret === process.env.WEBPUSH_SEND_SECRET) return true;

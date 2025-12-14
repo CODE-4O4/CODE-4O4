@@ -17,7 +17,7 @@ function isAdminFromCookie(cookieHeader: string | null) {
     const decoded = decodeURIComponent(raw);
     const user = JSON.parse(decoded);
     return user && user.role === 'admin';
-  } catch (err) {
+  } catch {
     return false;
   }
 }
@@ -32,30 +32,32 @@ export async function POST(req: Request) {
   }
 
   try {
-    const body = await req.json();
-    const raw = body.payload || { title: 'Test', body: 'This is a test notification' };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const requestBody = await req.json() as any;
+    const raw = requestBody.payload || { title: 'Test', body: 'This is a test notification' };
 
-    // Normalize/enrich payload so notifications are visually richer by default.
-    // Admin can override any of these fields by supplying them in the request payload.
+    
+    
     const payload = {
       title: raw.title || 'DevForge',
       body: raw.body || '',
       icon: raw.icon || '/app-icon-192.png',
       badge: raw.badge || '/app-icon-72.png',
       image: raw.image || undefined,
-      // Vibrate pattern (ms) - many Android devices will follow this when allowed in system settings
+      
       vibrate: raw.vibrate || [200, 100, 200],
-      // tag helps control whether notifications are replaced (same tag) or stacked (unique tag)
+      
       tag: raw.tag || raw.type || undefined,
       renotify: raw.renotify !== undefined ? raw.renotify : false,
       requireInteraction: raw.requireInteraction || false,
       actions: raw.actions || [],
       data: raw.data || {},
-    } as any;
+    } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const db = getDb();
     const subs = await listAllSubscriptions();
     const notifiedUsers = new Set<string>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const results: any[] = [];
     for (const wrapped of subs) {
       const sub = wrapped.subscription || wrapped;
@@ -67,7 +69,7 @@ export async function POST(req: Request) {
       if (!r.success) {
         const status = r.error && r.error.statusCode;
         if (status === 410 || status === 404) {
-          // remove gone subscription
+          
           try {
             await removeSubscriptionByEndpoint(sub.endpoint);
           } catch (err) {

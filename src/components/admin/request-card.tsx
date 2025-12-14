@@ -11,12 +11,12 @@ export const RequestCard = ({ request }: { request: AdminRequest }) => {
 
   const sendDecision = async (d: "approve" | "hold") => {
     setLoading(d === "approve" ? "approve" : "hold");
-    // optimistic UI update
+    
     setDecision(d);
 
     try {
-      // If you have a real API, call it here. We'll attempt a best-effort POST
-      // to `/api/admin/decision` (project may not have this route).
+      
+      
       const res = await fetch("/api/admin/decision", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,7 +29,7 @@ export const RequestCard = ({ request }: { request: AdminRequest }) => {
 
       setMessage(d === "approve" ? "Member approved." : "Moved to review.");
     } catch {
-      // If the API doesn't exist or fails, keep the optimistic state but show a message
+      
       setMessage(
         d === "approve"
           ? "Member approved (local preview)."

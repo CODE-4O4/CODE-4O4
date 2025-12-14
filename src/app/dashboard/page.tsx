@@ -12,11 +12,12 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { PageContainer } from "@/components/shared/page-container";
-import { Button } from "@/components/ui/button";
-import { registerProjectInterest, rsvpToEvent } from "@/lib/firebase/firestore";
+
+// import { registerProjectInterest } from "@/lib/firebase/firestore";
 import { formatDate } from "@/lib/utils";
 import type { ShowcaseProject } from "@/types";
 
+/*
 const STORAGE_KEYS = {
   projects: "project-interest-status",
   events: "event-rsvp-status",
@@ -38,24 +39,36 @@ const readCache = (key: string) => {
     return {};
   }
 };
+*/
+const toneMap: Record<string, string> = {
+  emerald: "from-orange-500/25 to-orange-600/10 text-orange-300",
+  sky: "from-orange-500/25 to-orange-600/10 text-sky-200",
+  indigo: "from-indigo-400/25 to-red-600/10 text-indigo-200",
+};
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [projects, setProjects] = useState<ShowcaseProject[]>([]);
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userProjects, setUserProjects] = useState<any[]>([]);
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [upcomingSessions, setUpcomingSessions] = useState<any[]>([]);
   const [stats, setStats] = useState({
     activeProjects: 0,
     upcomingSessions: 0,
   });
-  const [loadingProjects, setLoadingProjects] = useState(true);
+  // const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
-  const [projectStatus, setProjectStatus] = useState<Record<string, string>>(() =>
-    readCache(STORAGE_KEYS.projects),
-  );
+  
+  // const [projectStatus, setProjectStatus] = useState<Record<string, string>>(() =>
+  //   readCache(STORAGE_KEYS.projects),
+  // );
 
-  // Redirect to home if not authenticated
+  
   useEffect(() => {
     if (!isAuthenticated) {
       console.log("🔒 Not authenticated, redirecting to home");
@@ -63,7 +76,7 @@ export default function DashboardPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Fetch user-specific dashboard data
+  
   useEffect(() => {
     const fetchDashboardData = async () => {
       if (!user?.id) {
@@ -90,11 +103,11 @@ export default function DashboardPage() {
     };
 
     fetchDashboardData();
-    // Removed auto-refresh to save Firebase reads
-    // Dashboard will only load on page refresh or navigation
+    
+    
   }, [user?.id]);
 
-  // Fetch projects from Firebase (only on page load)
+  
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -114,27 +127,24 @@ export default function DashboardPage() {
       } catch (error) {
         console.error("❌ Error fetching projects:", error);
       } finally {
-        setLoadingProjects(false);
+        // setLoadingProjects(false);
       }
     };
 
     fetchProjects();
-    // Removed auto-refresh to save Firebase reads
+    
   }, []);
 
-  const profile = useMemo(
-    () => ({
-      role: user?.role ?? "student",
-    }),
-    [user],
-  );
 
-  // Dynamic stat cards based on user data (removed points and badges)
+
+  
   const dynamicStatCards = useMemo(() => [
     { label: "Active Projects", value: stats.activeProjects, icon: Layers, tone: "emerald" },
     { label: "Upcoming Sessions", value: stats.upcomingSessions, icon: Clock, tone: "indigo" },
   ], [stats]);
 
+  
+  /*
   const handleProjectRequest = async (projectId: string) => {
     setProjectStatus((prev) => ({ ...prev, [projectId]: "sending" }));
     const result = await registerProjectInterest(projectId, user?.id ?? "preview");
@@ -146,11 +156,12 @@ export default function DashboardPage() {
       return next;
     });
   };
+  */
 
   return (
     <PageContainer>
       <div className="space-y-8">
-        {/* Welcome Header */}
+        {}
         <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
           <p className="text-sm uppercase tracking-[0.3em] text-orange-300">
             Welcome back
@@ -208,7 +219,7 @@ export default function DashboardPage() {
                   </div>
                 ) : userProjects.length === 0 ? (
                   <div className="text-center text-white/60 py-8">
-                    <p className="mb-4">You're not part of any projects yet.</p>
+                    <p className="mb-4">You&apos;re not part of any projects yet.</p>
                     <Link
                       href="/projects"
                       className="text-orange-500 hover:text-orange-400 underline"

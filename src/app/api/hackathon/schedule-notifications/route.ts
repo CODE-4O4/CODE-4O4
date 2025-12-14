@@ -6,7 +6,7 @@ function isAdminOrSecret(req: Request) {
     const secret = req.headers.get('x-webpush-secret') || '';
     const cookieHeader = req.headers.get('cookie');
 
-    // Check cookie for admin role
+    
     if (cookieHeader) {
         try {
             const cookies = cookieHeader.split(';').map(c => c.trim());
@@ -19,20 +19,16 @@ function isAdminOrSecret(req: Request) {
                 }
             }
         } catch (e) {
-            // ignore parse errors
+            
         }
     }
 
-    // Check secret header
+    
     if (process.env.WEBPUSH_SEND_SECRET && secret === process.env.WEBPUSH_SEND_SECRET) return true;
     return false;
 }
 
-/**
- * POST: Schedule all hackathon notifications
- * Query params:
- *   - dryRun=true: Preview what would be scheduled without actually scheduling
- */
+
 export async function POST(req: Request) {
     if (!isAdminOrSecret(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -46,7 +42,7 @@ export async function POST(req: Request) {
         const db = getDb();
         const now = new Date();
 
-        // Filter out notifications that are in the past
+        
         const futureNotifications = schedule.filter(item => item.sendAt > now);
         const pastNotifications = schedule.filter(item => item.sendAt <= now);
 
@@ -68,12 +64,12 @@ export async function POST(req: Request) {
             });
         }
 
-        // Actually schedule the notifications
+        
         const results = [];
         const col = db.collection('webpush_schedules');
 
         for (const item of futureNotifications) {
-            // Check if this notification type is already scheduled
+            
             const existing = await col
                 .where('meta.type', '==', item.meta.type)
                 .where('status', '==', 'pending')
@@ -127,9 +123,7 @@ export async function POST(req: Request) {
     }
 }
 
-/**
- * GET: List all scheduled hackathon notifications
- */
+
 export async function GET(req: Request) {
     if (!isAdminOrSecret(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -168,9 +162,7 @@ export async function GET(req: Request) {
     }
 }
 
-/**
- * DELETE: Clear all scheduled hackathon notifications
- */
+
 export async function DELETE(req: Request) {
     if (!isAdminOrSecret(req)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -184,7 +176,7 @@ export async function DELETE(req: Request) {
 
         const batch = db.batch();
         snap.docs.forEach(doc => {
-            // Only delete hackathon-related notifications
+            
             const data = doc.data();
             if (data.meta?.type && data.meta.type.includes('hackathon') ||
                 ['day-before-reminder', 'checkin-reminder', 'opening-ceremony', 'coding-begins',

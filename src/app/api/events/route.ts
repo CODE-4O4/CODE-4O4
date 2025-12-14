@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/firebase/admin";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
     console.log("🔄 Fetching events from Firebase...");
 
-    // Get current date to filter upcoming events
+    
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const todayStr = now.toISOString().split('T')[0]; 
 
     const db = getDb();
     const eventsRef = db.collection("events");

@@ -2,16 +2,16 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/firebase/admin";
 import { archivePastSessions } from "@/lib/server/sessions-maintenance";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
     console.log("🔄 Fetching sessions from Firebase...");
 
-    // Get current date to filter upcoming sessions
+    
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const todayStr = now.toISOString().split('T')[0]; 
 
     const db = getDb();
     await archivePastSessions(db);
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
 
     console.log("🔄 Creating new session:", title);
 
-    // Verify user has admin or mentor role
+    
     const db = getDb();
     const userRef = db.collection("members").doc(userId);
     const userDoc = await userRef.get();
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate required fields
+    
     if (!title || !date) {
       return NextResponse.json(
         { ok: false, error: "Title and date are required" },
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create session document
+    
     const todayStr = new Date().toISOString().split('T')[0];
     const sessionData = {
       title,
@@ -131,7 +131,7 @@ export async function PUT(request: Request) {
 
     console.log("🔄 Updating session:", sessionId);
 
-    // Verify user has admin or mentor role
+    
     const db = getDb();
     const userRef = db.collection("members").doc(userId);
     const userDoc = await userRef.get();
@@ -151,7 +151,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    // Validate session ID
+    
     if (!sessionId) {
       return NextResponse.json(
         { ok: false, error: "Session ID is required" },
@@ -159,7 +159,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    // Update session document
+    
     const sessionRef = db.collection("sessions").doc(sessionId);
     const sessionDoc = await sessionRef.get();
 
@@ -219,7 +219,7 @@ export async function DELETE(request: Request) {
 
     console.log("🔄 Deleting session:", sessionId);
 
-    // Verify user has admin or mentor role
+    
     const db = getDb();
     const userRef = db.collection("members").doc(userId!);
     const userDoc = await userRef.get();
@@ -239,7 +239,7 @@ export async function DELETE(request: Request) {
       );
     }
 
-    // Validate session ID
+    
     if (!sessionId) {
       return NextResponse.json(
         { ok: false, error: "Session ID is required" },
@@ -247,7 +247,7 @@ export async function DELETE(request: Request) {
       );
     }
 
-    // Delete session document
+    
     const sessionRef = db.collection("sessions").doc(sessionId);
     const sessionDoc = await sessionRef.get();
 

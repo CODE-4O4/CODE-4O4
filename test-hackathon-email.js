@@ -5,6 +5,7 @@
  * This verifies that the email system is working correctly
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 require('dotenv').config({ path: '.env.local' });
 
 async function testHackathonEmail() {

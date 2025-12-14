@@ -18,19 +18,21 @@ export function initWebPushIfNeeded() {
     const { publicKey, privateKey, subject } = getVapidConfig();
     webpush.setVapidDetails(subject, publicKey, privateKey);
   } catch (err) {
-    // rethrow so callers can handle missing env keys
+    
     throw err;
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function saveSubscription(payload: any) {
-  // payload can be either { subscription } or { subscription, userId }
+  
   const subscription = payload.subscription || payload;
   const userId = payload.userId || null;
   const db = getDb();
   const col = db.collection(COLLECTION);
   const id = encodeURIComponent(subscription.endpoint);
   const docRef = col.doc(id);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = { subscription, createdAt: new Date() };
   if (userId) data.userId = userId;
   await docRef.set(data, { merge: true });
@@ -47,6 +49,7 @@ export async function removeSubscriptionByEndpoint(endpoint: string) {
 export async function listAllSubscriptions() {
   const db = getDb();
   const snap = await db.collection(COLLECTION).get();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const items: any[] = [];
   snap.forEach((doc) => {
     const d = doc.data();
@@ -55,13 +58,15 @@ export async function listAllSubscriptions() {
   return items;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function sendNotificationToSubscription(subscription: any, payload: any) {
   initWebPushIfNeeded();
   try {
     const result = await webpush.sendNotification(subscription, JSON.stringify(payload));
     return { success: true, result };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    // web-push throws with statusCode (e.g., 410) for gone subscriptions
+    
     return { success: false, error: err };
   }
 }

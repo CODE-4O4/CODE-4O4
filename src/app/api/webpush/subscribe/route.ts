@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     if (!subscription || !subscription.endpoint) {
       return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 });
     }
-    // Save subscription with optional userId for targeting
+    
     await saveSubscription({ subscription, userId });
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (err) {

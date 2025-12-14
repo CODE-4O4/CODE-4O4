@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb, serverTimestamp, getMessaging } from "@/lib/firebase/admin";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
@@ -33,15 +33,15 @@ export async function POST(request: Request) {
         createdAt: serverTimestamp(),
       });
       
-      // Get project details
+      
       const projectDoc = await db.collection("projects").doc(projectId).get();
       const projectData = projectDoc.data();
       
-      // Get user details
+      
       const userDoc = await db.collection("members").doc(userId).get();
       const userData = userDoc.data();
       
-      // Notify project owner
+      
       if (projectData?.ownerId) {
         const ownerDoc = await db.collection("members").doc(projectData.ownerId).get();
         const ownerData = ownerDoc.data();
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
           const notificationTitle = `New Interest: ${projectData?.title || "Your Project"}`;
           const notificationBody = `${userData?.name || "Someone"} is interested in joining your project`;
           
-          // Send to all owner's devices
+          
           for (const token of ownerData.fcmTokens) {
             try {
               if (messaging) {
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
             }
           }
           
-          // Store notification in database
+          
           await db.collection("notifications").add({
             userId: projectData.ownerId,
             title: notificationTitle,
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
         }
       }
       
-      // Send confirmation to user who expressed interest
+      
       if (userData?.fcmTokens && userData.fcmTokens.length > 0) {
         const messaging = getMessaging();
         const confirmTitle = `Interest Registered: ${projectData?.title || "Project"}`;
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
           }
         }
         
-        // Store notification
+        
         await db.collection("notifications").add({
           userId,
           title: confirmTitle,

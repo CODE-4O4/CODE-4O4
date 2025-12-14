@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/firebase/admin";
 
-// Force Node.js runtime for firebase-admin
+
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     
     console.log("🔄 Fetching profile for user:", userId);
     
-    // Get user profile from members collection
+    
     const userDoc = await db.collection("members").doc(userId).get();
 
     if (!userDoc.exists) {
@@ -72,10 +72,10 @@ export async function PATCH(request: NextRequest) {
     const db = getDb();
     const userRef = db.collection("members").doc(userId);
 
-    // Check if user exists
+    
     const userDoc = await userRef.get();
     if (!userDoc.exists) {
-      // Create new profile if doesn't exist
+      
       await userRef.set({
         ...updates,
         createdAt: new Date(),
@@ -83,7 +83,7 @@ export async function PATCH(request: NextRequest) {
       });
       console.log("✅ Profile created:", userId);
     } else {
-      // Prepare update data
+      
       const allowedFields = [
         'name',
         'email',
@@ -109,7 +109,7 @@ export async function PATCH(request: NextRequest) {
         }
       });
 
-      // Update the profile
+      
       await userRef.update(updateData);
       console.log("✅ Profile updated:", userId);
     }

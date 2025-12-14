@@ -46,14 +46,14 @@ const AdminPage = () => {
   const [credentials, setCredentials] = useState<{ username: string; password: string; name: string; email: string } | null>(null);
   const [regenerating, setRegenerating] = useState(false);
 
-  // Check if user is admin
+  
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "admin") {
       router.push("/");
     }
   }, [isAuthenticated, user, router]);
 
-  // Fetch pending members
+  
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "admin") {
       return;
@@ -77,11 +77,11 @@ const AdminPage = () => {
 
     fetchPendingMembers();
     
-    // Removed auto-refresh to save Firebase reads
-    // Admins can refresh page manually to see new requests
+    
+    
   }, []);
 
-  // Fetch project interests from Firestore
+  
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "admin") {
       return;
@@ -108,8 +108,8 @@ const AdminPage = () => {
 
     fetchInterests();
     
-    // Removed auto-refresh to save Firebase reads
-    // Admins can refresh page manually to see new requests
+    
+    
   }, [isAuthenticated, user]);
 
   const handleApproveMember = async (memberId: string, memberEmail: string, memberName: string) => {
@@ -122,7 +122,7 @@ const AdminPage = () => {
         body: JSON.stringify({
           memberId,
           decision: "approved",
-          adminId: "admin-1", // TODO: Get from auth context
+          adminId: "admin-1", 
         }),
       });
 
@@ -134,7 +134,7 @@ const AdminPage = () => {
         const username = credentials.username || "newmember";
         const password = credentials.password || "member123";
         
-        // Show credentials modal
+        
         setCredentials({
           username: username,
           password: password,
@@ -143,7 +143,7 @@ const AdminPage = () => {
         });
         setShowCredentialsModal(true);
         
-        // Copy credentials to clipboard
+        
         const credentialsText = `Username: ${username}\nPassword: ${password}`;
         navigator.clipboard.writeText(credentialsText).then(() => {
           console.log("📋 Credentials copied to clipboard");
@@ -169,7 +169,7 @@ const AdminPage = () => {
         body: JSON.stringify({
           memberId,
           decision: "rejected",
-          adminId: "admin-1", // TODO: Get from auth context
+          adminId: "admin-1", 
         }),
       });
 
@@ -204,7 +204,7 @@ const AdminPage = () => {
       
       if (result.ok) {
         alert("✅ Approved!");
-        // Remove from list
+        
         setProjectInterests((prev) => prev.filter((r) => r.id !== interestId));
       } else {
         alert(`Failed: ${result.message}`);
@@ -248,7 +248,7 @@ const AdminPage = () => {
     }
   };
 
-  // Don't render anything if not admin (check AFTER all hooks)
+  
   if (!isAuthenticated || user?.role !== "admin") {
     return null;
   }
@@ -283,7 +283,7 @@ const AdminPage = () => {
       }
     />
 
-    {/* Tab Navigation */}
+    {}
     <div className="mt-8 flex gap-4 border-b border-white/10">
       <button
         onClick={() => setActiveTab("members")}
@@ -307,7 +307,7 @@ const AdminPage = () => {
       </button>
     </div>
 
-    {/* Club Member Requests */}
+    {}
     {activeTab === "members" && (
       <div className="mt-8">
         {loading ? (
@@ -427,7 +427,7 @@ const AdminPage = () => {
       </div>
     )}
 
-    {/* Project Join Requests */}
+    {}
     {activeTab === "projects" && (
       <div className="mt-8">
         {loading ? (
@@ -492,7 +492,7 @@ const AdminPage = () => {
       </div>
     )}
 
-    {/* Credentials Modal */}
+    {}
     {showCredentialsModal && credentials && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
         <div className="relative max-w-lg w-full rounded-3xl border border-orange-500/30 bg-black/95 p-8">

@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
 
-// Create reusable transporter
+
 const createTransporter = () => {
   const port = parseInt(process.env.SMTP_PORT || "465");
-  const secure = port === 465; // true for 465 (SSL), false for 587 (STARTTLS)
+  const secure = port === 465; 
 
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.purelymail.com",
@@ -200,6 +200,7 @@ DevForge Team
     const info = await transporter.sendMail(mailOptions);
     console.log("✅ [Email Service] Email sent successfully:", info.messageId);
     return { success: true, messageId: info.messageId };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("❌ [Email Service] Error sending email:", error);
     console.error("   Error code:", error?.code);
@@ -232,7 +233,7 @@ export async function sendBulkCredentialsEmails(
       ...result,
     });
 
-    // Add delay to avoid rate limiting
+    
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
@@ -501,8 +502,9 @@ export async function sendHackathonRegistrationEmail({
                 
                 <div class="spots-banner">
                   <p>
-                    ⚡ Only <span class="spots-number">20 SLOTS</span> Left<br>
-                    <span style="font-size: 15px; color: #fbbf24;">Selection-based registration • Register ASAP!</span>
+                    ⚡ Only <span class="spots-number">10 SLOTS</span> Left<br>
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    <span style="font-size: 15px; color: #fbbf24;" } as any,>Selection-based registration • Register ASAP!</span>
                   </p>
                 </div>
                 
@@ -579,11 +581,100 @@ This is an automated confirmation email.
     const info = await transporter.sendMail(mailOptions);
     console.log("✅ [Email Service] Hackathon confirmation email sent successfully:", info.messageId);
     return { success: true, messageId: info.messageId };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("❌ [Email Service] Error sending hackathon confirmation email:", error);
     console.error("   Error code:", error?.code);
     console.error("   Error response:", error?.response);
     console.error("   Error command:", error?.command);
+    return { success: false, error: String(error) };
+  }
+}
+
+export async function sendAcceptanceEmail(to: string) {
+  try {
+    console.log(`📧 [Email Service] Sending acceptance email to ${to}...`);
+
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error("❌ [Email Service] SMTP credentials not configured");
+      return { success: false, error: "SMTP credentials missing" };
+    }
+
+    const transporter = createTransporter();
+
+    const mailOptions = {
+      from: `"DevForge Team" <${process.env.SMTP_USER}>`,
+      to,
+      subject: "🎉 Congratulations! You've been selected for DevForge 2025!",
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            .container { border: 1px solid #ddd; border-radius: 8px; padding: 30px; background: #fff; }
+            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #f97316; padding-bottom: 20px; }
+            .highlight { color: #f97316; font-weight: bold; }
+            .action-box { background: #fff7ed; border: 1px solid #ffedd5; padding: 20px; border-radius: 8px; margin: 25px 0; text-align: center; }
+            .footer { margin-top: 30px; font-size: 13px; color: #666; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="color: #ea580c; margin: 0;">🎉 You're Selected!</h1>
+              <p style="margin-top: 10px; font-size: 18px;">DevForge Hackathon 2025</p>
+            </div>
+            
+            <p>Hi there,</p>
+            
+            <p>Congratulations! We are thrilled to inform you that you have been <strong class="highlight">selected</strong> for the DevForge Hackathon on December 20, 2025.</p>
+            
+            <div class="action-box">
+              <h2 style="margin-top: 0; color: #c2410c;">⚠️ Action Required: Confirm Attendance</h2>
+              <p style="font-size: 16px;">Please reply to this email with:</p>
+              <p style="font-weight: bold; font-size: 18px; color: #ea580c;">"YES, I AM COMING"</p>
+            </div>
+
+            <p><strong>Important:</strong> We have very limited spots (only <span class="highlight">10 slots left!</span>), and many students are waiting for a chance. If you do not confirm by replying to this email, we may have to release your seat to another deserving candidate.</p>
+            
+            <p>If you cannot make it, please let us know immediately so we can offer your spot to someone else.</p>
+            
+            <p>We look forward to seeing you there!</p>
+            
+            <p>Best regards,<br><strong>DevForge Team</strong></p>
+            
+            <div class="footer">
+              <p>Newton School of Technology × S-VYASA</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `
+Congratulations! You've been selected for DevForge 2025!
+
+Hi there,
+
+Congratulations! We are thrilled to inform you that you have been selected for the DevForge Hackathon on December 20, 2025.
+
+** ACTION REQUIRED: Confirm Attendance **
+Please reply to this email with "YES, I AM COMING" to confirm your seat.
+
+Important: We have limited spots (only 10 slots left!), and many students are on the waitlist. If you do not confirm by replying, we may release your seat to someone else.
+
+If you cannot make it, please let us know immediately.
+
+Best regards,
+DevForge Team
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ [Email Service] Acceptance email sent to ${to}: ${info.messageId}`);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error(`❌ [Email Service] Failed to send acceptance email to ${to}:`, error);
     return { success: false, error: String(error) };
   }
 }

@@ -1,4 +1,4 @@
-// Notifications are disabled. Export safe no-op stubs so callers don't break.
+
 
 export interface NotificationPayload {
   title: string;
@@ -21,6 +21,7 @@ export async function getFCMToken(_vapidKey?: string): Promise<string | null> {
   return null;
 }
 
+
 export async function subscribeToNotifications(_userId: string, _vapidKey?: string): Promise<boolean> {
   return false;
 }
@@ -29,13 +30,15 @@ export async function unsubscribeFromNotifications(_userId: string): Promise<boo
   return false;
 }
 
+
 export function onForegroundMessage(_callback: (payload: any) => void): (() => void) | null {
   return null;
 }
 
 export async function showNotification(_notification: NotificationPayload): Promise<void> {
-  // no-op
+  
 }
+
 
 export async function updateNotificationPreferences(_userId: string, _preferences: any): Promise<boolean> {
   return false;
