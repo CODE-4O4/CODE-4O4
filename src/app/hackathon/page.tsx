@@ -2,6 +2,7 @@ import { Hero } from "@/components/hackathon/hero";
 import { Schedule } from "@/components/hackathon/schedule";
 import { FAQ } from "@/components/hackathon/faq";
 import { Sponsors } from "@/components/hackathon/sponsors";
+import { Judges } from "@/components/hackathon/judges";
 import { RetroTerminal } from "@/components/hackathon/RetroTerminal";
 
 export default function HackathonPage() {
@@ -15,6 +16,7 @@ export default function HackathonPage() {
             </section>
             
             <Sponsors />
+            <Judges />
             <Schedule />
             <FAQ />
 
