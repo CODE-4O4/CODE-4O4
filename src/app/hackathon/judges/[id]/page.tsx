@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { CheckCircle2, Calendar, MapPin, Award, Globe, Mail } from 'lucide-react';
 import { PrintButton } from '@/components/print-button';
+import fs from 'fs';
+import path from 'path';
 
 interface JudgeData {
   name: string;
@@ -23,18 +25,13 @@ interface JudgeDatabase {
 
 async function getJudgeData(id: string): Promise<JudgeData | null> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/judges/verify.json`, {
-      cache: 'no-store'
-    });
-    
-    if (!response.ok) {
-      return null;
-    }
-    
-    const data: JudgeDatabase = await response.json();
+    // Read the JSON file from the filesystem instead of fetching via HTTP
+    const filePath = path.join(process.cwd(), 'public', 'judges', 'verify.json');
+    const fileContents = fs.readFileSync(filePath, 'utf8');
+    const data: JudgeDatabase = JSON.parse(fileContents);
     return data[id] || null;
   } catch (error) {
-    console.error('Error fetching judge data:', error);
+    console.error('Error reading judge data:', error);
     return null;
   }
 }
